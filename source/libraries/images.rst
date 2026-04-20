@@ -1,278 +1,240 @@
 ########################
-Image Manipulation Class
+图像处理类
 ########################
 
-CodeIgniter's Image Manipulation class lets you perform the following
-actions:
+CodeIgniter 的图像处理类支持以下操作：
 
--  Image Resizing
--  Thumbnail Creation
--  Image Cropping
--  Image Rotating
--  Image Watermarking
+-  图像缩放
+-  缩略图生成
+-  图像裁剪
+-  图像旋转
+-  图像水印
 
-The following image libraries are supported: GD/GD2, and ImageMagick.
+支持以下图像库：GD/GD2 和 ImageMagick。
 
 .. contents::
-:local:
+    :local:
+    :depth: 2
 
 **********************
-Initializing the Class
+初始化类
 **********************
 
-Like most other classes in CodeIgniter, the image class is initialized
-in your controller by calling the Services class::
+与 CodeIgniter 中的大多数类一样，图像类通过调用全局函数 ``service()`` 在控制器中初始化：
 
-	$image = Config\Services::image();
+.. literalinclude:: images/001.php
 
-You can pass the alias for the image library you wish to use into the
-Service function::
+你可以将图像库的别名传递给全局函数 ``service()``：
 
-    $image = Config\Services::image('imagick');
+.. literalinclude:: images/002.php
 
-The available Handlers are as follows:
+可用的 Handler 如下：
 
-- gd        The GD/GD2 image library
-- imagick   The ImageMagick library.
+- ``gd``      GD/GD2 图像库
+- ``imagick`` ImageMagick 库
 
-If using the ImageMagick library, you must set the path to the library on your
-server in **application/Config/Images.php**.
+.. note:: ImageMagick Handler 需要安装 imagick 扩展。
 
-.. note:: The ImageMagick handler does NOT require the imagick extension to be
-        loaded on the server. As long as your script can access the library
-        and can run ``exec()`` on the server, it should work.
+.. note::
+   在 Windows 平台上，ImageMagick Handler 在加载图像时需要使用 **绝对文件路径** （例如使用 ``WRITEPATH`` 或 ``FCPATH``）。
 
-Processing an Image
-===================
+*******************
+处理图像
+*******************
 
-Regardless of the type of processing you would like to perform
-(resizing, cropping, rotation, or watermarking), the general process is
-identical. You will set some preferences corresponding to the action you
-intend to perform, then call one of the available processing functions.
-For example, to create an image thumbnail you'll do this::
+无论你想要执行哪种类型的处理（缩放、裁剪、旋转或水印），处理流程基本相同。需要设置一些与预期操作对应的偏好设置，然后调用处理函数。
 
-    $image = Config\Services::image()
-        ->withFile('/path/to/image/mypic.jpg')
-        ->fit(100, 100, 'center')
-        ->save('/path/to/image/mypic_thumb.jpg');
+例如，创建图像缩略图的代码如下：
 
-The above code tells the library  to look for an image
-called *mypic.jpg* located in the source_image folder, then create a
-new image from it that is 100 x 100pixels using the GD2 image_library,
-and save it to a new file (the thumb). Since it is using the fit() method,
-it will attempt to find the best portion of the image to crop based on the
-desired aspect ratio, and then crop and resize the result.
+.. literalinclude:: images/003.php
 
-An image can be processed through as many of the available methods as
-needed before saving. The original image is left untouched, and a new image
-is used and passed through each method, applying the results on top of the
-previous results::
+以上代码告诉库在 **/path/to/image** 文件夹中查找名为 **mypic.jpg** 的图像，然后从中创建一个 100 x 100 像素的新图像，并保存到新文件 **mypic_thumb.jpg**。由于使用了 ``fit()`` 方法，它会根据期望的宽高比尝试找到最佳裁剪区域，然后裁剪并缩放结果。
 
-    $image = Config\Services::image()
-        ->withFile('/path/to/image/mypic.jpg')
-        ->reorient()
-        ->rotate(90)
-        ->crop(100, 100, 0, 0)
-        ->save('/path/to/image/mypic_thumb.jpg');
+一个图像可以在保存前按顺序应用多个处理方法。原始图像保持原样，使用新图像并逐个传递给每个方法，在上一次结果的基础上应用新的处理效果：
 
-This example would take the same image and first fix any mobile phone orientation issues,
-rotate the image by 90 degress, and then crop the result into a 100x100 pixel image,
-starting at the top left corner. The result would be saved as the thumbnail.
+.. literalinclude:: images/004.php
 
-.. note:: In order for the image class to be allowed to do any
-	processing, the folder containing the image files must have write
-	permissions.
+此示例将获取同一图像，首先修复任何手机方向问题，将图像旋转 90 度，然后将结果裁剪为从左上角开始的 100 x 100 像素图像。最终结果将保存为缩略图。
 
-.. note:: Image processing can require a considerable amount of server
-	memory for some operations. If you are experiencing out of memory errors
-	while processing images you may need to limit their maximum size, and/or
-	adjust PHP memory limits.
+.. note:: 为允许图像类执行任何处理，包含图像文件的文件夹必须具有写入权限。
 
-Processing Methods
-==================
+.. note:: 某些图像处理操作可能需要占用大量服务器内存。如果在处理图像时遇到内存不足错误，可能需要限制图像的最大尺寸，或调整 PHP 内存限制。
 
-There are six available processing methods:
+图像质量
+=============
 
--  $image->crop()
--  $image->fit()
--  $image->flip()
--  $image->resize()
--  $image->rotate()
--  $image->text()
+``save()`` 可以接受额外的 ``$quality`` 参数来更改生成的图像质量。取值范围为 0 到 100，框架默认值为 90。此参数仅适用于 JPEG 和 WebP 图像，其他格式将被忽略：
 
+.. note:: 自 v4.4.0 起，WebP 的 ``$quality`` 参数可用。
 
-These methods return the class instance so they can be chained together, as shown above.
-If they fail they will throw a ``CodeIgniter\Images\ImageException`` that contains
-the error message. A good practice is to catch the exceptions, showing an
-error upon failure, like this::
+.. literalinclude:: images/005.php
 
-	try {
-        $image = Config\Services::image()
-            ->withFile('/path/to/image/mypic.jpg')
-            ->fit(100, 100, 'center')
-            ->save('/path/to/image/mypic_thumb.jpg');
-	}
-	catch (CodeIgniter\Images\ImageException $e)
-	{
-		echo $e->getMessage();
-	}
+.. note:: 质量越高，文件越大。参见 https://www.php.net/manual/zh/function.imagejpeg.php
 
-.. note:: You can optionally specify the HTML formatting to be applied to
-	the errors, by submitting the opening/closing tags in the function,
-	like this::
+如果你只想更改图像质量而不进行其他处理，需要包含图像资源，否则会得到完全相同的副本：
 
-	$this->image_lib->display_errors('<p>', '</p>');
+.. literalinclude:: images/006.php
 
+******************
+处理方法
+******************
 
-Cropping Images
----------------
+共有 8 种可用的处理方法：
 
-Images can be cropped so that only a portion of the original image remains. This is often used when creating
-thumbnail images that should match a certain size/aspect ratio. This is handled with the ``crop()`` method::
+-  ``$image->crop()``
+-  ``$image->convert()``
+-  ``$image->fit()``
+-  ``$image->flatten()``
+-  ``$image->flip()``
+-  ``$image->resize()``
+-  ``$image->rotate()``
+-  ``$image->text()``
+
+这些方法返回类实例，因此可以链式调用，如上所示。如果失败，会抛出包含错误消息的 ``CodeIgniter\Images\ImageException``。最佳实践是捕获异常，在失败时显示错误，如下所示：
+
+.. literalinclude:: images/007.php
+
+裁剪图像
+===============
+
+裁剪图像，只保留原始图像的一部分。这通常用于创建符合特定尺寸/宽高比的缩略图。通过 ``crop()`` 方法实现：
 
     crop(int $width = null, int $height = null, int $x = null, int $y = null, bool $maintainRatio = false, string $masterDim = 'auto')
 
-- **$width** is the desired width of the resulting image, in pixels.
-- **$height** is the desired height of the resulting image, in pixels.
-- **$x** is the number of pixels from the left side of the image to start cropping.
-- **$y** is the number of pixels from the top of the image to start cropping.
-- **$maintainRatio** will, if true, adjust the final dimensions as needed to maintain the image's original aspect ratio.
-- **$masterDim** specifies which dimension should be left untouched when $maintainRatio is true. Values can be: 'width', 'height', or 'auto'.
+- ``$width`` 是结果图像的期望宽度，单位为像素。
+- ``$height`` 是结果图像的期望高度，单位为像素。
+- ``$x`` 是从图像左侧开始裁剪的像素数。
+- ``$y`` 是从图像顶部开始裁剪的像素数。
+- ``$maintainRatio`` 如果为 true，将根据需要调整最终尺寸以保持图像原始宽高比。
+- ``$masterDim`` 指定当 ``$maintainRatio`` 为 true 时应保持不变的尺寸。可选值：``'width'``、``'height'`` 或 ``'auto'``。
 
-To take a 50x50 pixel square out of the center of an image, you would need to first calculate the appropriate x and y
-offset values::
+要从图像中心取出 50 x 50 像素的区域，需要首先计算适当的 x 和 y 偏移值：
 
-    $info = Services::image('imagick')
-			->withFile('/path/to/image/mypic.jpg')
-			->getFile()
-			->getProperties(true);
+.. literalinclude:: images/008.php
 
-    $xOffset = ($info['width'] / 2) - 25;
-    $yOffset = ($info['height'] / 2) - 25;
+转换图像
+=================
 
-    Services::image('imagick')
-        ->withFile('/path/to/image/mypic.jpg')
-        ->crop(50, 50, $xOffset, $yOffset)
-        ->save('path/to/new/image.jpg');
+``convert()`` 方法更改库内部对目标文件格式的指示符。这不会触及实际的图像资源，但会向 ``save()`` 指示使用什么格式：
 
-Fitting Images
---------------
+    convert(int $imageType)
 
-The ``fit()`` method aims to help simplify cropping a portion of an image in a "smart" way, by doing the following steps:
+- ``$imageType`` 是 PHP 的图像类型常量之一（参见 https://www.php.net/manual/zh/function.image-type-to-mime-type.php）：
 
-- Determine the correct portion of the original image to crop in order to maintain the desired aspect ratio.
-- Crop the original image.
-- Resize to the final dimensions.
+  .. literalinclude:: images/009.php
+
+.. note:: ImageMagick 已根据文件扩展名指示的类型保存文件，忽略 ``$imageType``。
+
+适配图像
+==============
+
+``fit()`` 方法旨在通过以下步骤帮助简化"智能"裁剪图像的某个部分：
+
+- 确定原始图像的正确裁剪区域以保持期望的宽高比。
+- 裁剪原始图像。
+- 缩放到最终尺寸。
 
 ::
 
     fit(int $width, int $height = null, string $position = 'center')
 
-- **$width** is the desired final width of the image.
-- **$height** is the desired final height of the image.
-- **$position** determines the portion of the image to crop out. Allowed positions: 'top-left', 'top', 'top-right', 'left', 'center', 'right', 'bottom-left', 'bottom', 'bottom-right'.
+- ``$width`` 是图像的期望最终宽度。
+- ``$height`` 是图像的期望最终高度。
+- ``$position`` 确定要裁剪出图像的哪个部分。允许的位置：``'top-left'``、``'top'``、``'top-right'``、``'left'``、``'center'``、``'right'``、``'bottom-left'``、``'bottom'``、``'bottom-right'``。
 
-This provides a much simpler way to crop that will always maintain the aspect ratio::
+这提供了一种更简单的裁剪方式，始终能保持宽高比：
 
-    Services::image('imagick')
-        ->withFile('/path/to/image/mypic.jpg')
-        ->fit(100, 150, 'left')
-        ->save('path/to/new/image.jpg');
+.. literalinclude:: images/010.php
 
-Flipping Images
----------------
+扁平化图像
+=================
 
-Images can be flipped along either their horizontal or vertical axis::
+``flatten()`` 方法旨在为透明图像（PNG）添加背景色，并将 RGBA 像素转换为 RGB 像素
+
+- 在将透明图像转换为 jpg 时指定背景色。
+
+::
+
+    flatten(int $red = 255, int $green = 255, int $blue = 255)
+
+- ``$red`` 是背景的红色值。
+- ``$green`` 是背景的绿色值。
+- ``$blue`` 是背景的蓝色值。
+
+.. literalinclude:: images/011.php
+
+翻转图像
+===============
+
+图像可以沿水平轴或垂直轴翻转：
 
     flip(string $dir)
 
-- **$dir** specifies the axis to flip along. Can be either 'vertical' or 'horizontal'.
+- ``$dir`` 指定翻转的轴。可以是 ``'vertical'`` （垂直）或 ``'horizontal'`` （水平）。
+
+.. literalinclude:: images/012.php
+
+缩放图像
+===============
+
+可以使用 ``resize()`` 方法将图像缩放到任何需要的尺寸：
+
+    resize(int $width, int $height, bool $maintainRatio = false, string $masterDim = 'auto')
+
+- ``$width`` 是新图像的期望宽度，单位为像素
+- ``$height`` 是新图像的期望高度，单位为像素
+- ``$maintainRatio`` 决定图像是拉伸以适应新尺寸，还是保持原始宽高比。
+- ``$masterDim`` 指定在保持比例时应保留哪个轴的尺寸。可选 ``'width'`` 或 ``'height'``。
+
+缩放图像时，你可以选择是否保持原始图像的比例，或将新图像拉伸/压缩以适应期望的尺寸。如果 ``$maintainRatio`` 为 true，``$masterDim`` 指定的尺寸将保持不变，而另一个尺寸将根据原始图像的宽高比进行更改。
+
+.. literalinclude:: images/013.php
+
+旋转图像
+===============
+
+``rotate()`` 方法允许以 90 度为增量旋转图像：
+
+    rotate(float $angle)
+
+- ``$angle`` 是旋转的度数。可选 ``90``、``180``、``270``。
+
+.. note:: 虽然 ``$angle`` 参数接受 float 类型，但在处理过程中会转换为整数。如果值不是上述三个值之一，会抛出 ``CodeIgniter\Images\ImageException``。
+
+添加文字水印
+=======================
+
+可以使用 ``text()`` 方法非常简单地在图像上叠加文字水印。适用于放置版权声明、摄影师姓名，或简单地将图像标记为预览版，防止被用于他人的最终产品。
 
 ::
 
-    Services::image('imagick')
-        ->withFile('/path/to/image/mypic.jpg')
-        ->flip('horizontal')
-        ->save('path/to/new/image.jpg');
+    text(string $text, array $options = [])
 
-Resizing Images
----------------
+第一个参数是要显示的文本字符串。第二个参数是选项数组，允许指定文本的显示方式：
 
-Images can be resized to fit any dimension you require with the resize() method::
+.. literalinclude:: images/014.php
 
-	resize(int $width, int $height, bool $maintainRatio = false, string $masterDim = 'auto')
+可识别的选项如下：
 
-- **$width** is the desired width of the new image in pixels
-- **$height** is the desired height of the new image in pixels
-- **$maintainRatio** determines whether the image is stretched to fit the new dimensions, or the original aspect ratio is maintained.
-- **$masterDim** specifies which axis should have its dimension honored when maintaining ratio. Either 'width', 'height'.
+- ``color``         文本颜色（十六进制数字），如 ``'#ff0000'``
+- ``opacity``        表示文本不透明度的数字，范围 ``0`` 到 ``1``。
+- ``withShadow``    布尔值，是否显示阴影。
+- ``shadowColor``   阴影颜色（十六进制数字）
+- ``shadowOffset``    阴影偏移的像素数。同时应用于垂直和水平值。
+- ``hAlign``        水平对齐：``'left'``、``'center'``、``'right'``
+- ``vAlign``        垂直对齐：``'top'``、``'middle'``、``'bottom'``
+- ``hOffset``        x 轴上的额外偏移，单位为像素
+- ``vOffset``        y 轴上的额外偏移，单位为像素
+- ``fontPath``        要使用的 TTF 字体的完整服务器路径。如未提供，将使用系统字体。
+- ``fontSize``        要使用的字体大小。使用 GD handler 和系统字体时，有效值为 ``1`` 到 ``5``。
 
-When resizing images you can choose whether to maintain the ratio of the original image, or stretch/squash the new
-image to fit the desired dimensions. If $maintainRatio is true, the dimension specified by $masterDim will stay the same,
-while the other dimension will be altered to match the original image's aspect ratio.
+清除图像元数据
+=======================
 
-::
+此方法用于移除图像中的元数据（EXIF、XMP、ICC、IPTC、注释等）。
 
-	Services::image('imagick')
-        ->withFile('/path/to/image/mypic.jpg')
-        ->resize(200, 100, true, 'height')
-        ->save('path/to/new/image.jpg');
+.. important:: GD 图像库在处理过程中会自动剥离所有元数据，因此在使用 GD 处理器时，此方法不会产生额外效果。这是 GD 本身的固有行为，且无法修改。
 
+保存操作期间会重新生成显示图像所需的必要技术元数据（如尺寸、色深）。除此之外，所有隐私敏感信息（如 GPS 位置、相机详情和时间戳）都将被彻底移除。
 
-Rotating Images
----------------
-
-The rotate() method allows you to rotate an image in 90 degree increments::
-
-	rotate(float $angle)
-
-- **$angle** is the number of degrees to rotate. One of '90', '180', '270'.
-
-.. note:: While the $angle parameter accepts a float, it will convert it to an integer during the process.
-		If the value is any other than the three values listed above, it will throw a CodeIgniter\Images\ImageException.
-
-
-Adding a Text Watermark
------------------------
-
-You can overlay a text watermark onto the image very simply with the text() method. This is useful for placing copyright
-notices, photogropher names, or simply marking the images as a preview so they won't be used in other people's final
-products.
-
-::
-
-	text(string $text, array $options = [])
-
-The first parameter is the string of text that you wish to display. The second parameter is an array of options
-that allow you to specify how the text should be displayed::
-
-	Services::image('imagick')
-        ->withFile('/path/to/image/mypic.jpg')
-        ->text('Copyright 2017 My Photo Co', [
-        	'color' => '#fff',
-        	'opacity' => 0.5,
-        	'withShadow' => true,
-        	'hAlign' => 'center',
-        	'vAlign' => 'bottom',
-        	'fontSize' => 20
-        ])
-        ->save('path/to/new/image.jpg');
-
-The possible options that are recognized are as follows:
-
-- color         Text Color (hex number), i.e. #ff0000
-- opacity		A number between 0 and 1 that represents the opacity of the text.
-- withShadow	Boolean value whether to display a shadow or not.
-- shadowColor   Color of the shadow (hex number)
-- shadowOffset	How many pixels to offset the shadow. Applies to both the vertical and horizontal values.
-- hAlign        Horizontal alignment: left, center, right
-- vAlign        Vertical alignment: top, middle, bottom
-- hOffset		Additional offset on the x axis, in pixels
-- vOffset		Additional offset on the y axis, in pixels
-- fontPath		The full server path to the TTF font you wish to use. System font will be used if none is given.
-- fontSize		The font size to use. When using the GD handler with the system font, valid values are between 1-5.
-
-.. note:: The ImageMagick driver does not recognize full server path for fontPath. Instead, simply provide the
-		name of one of the installed system fonts that you wish to use, i.e. Calibri.
-
-
+.. literalinclude:: images/015.php

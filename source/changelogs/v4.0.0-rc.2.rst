@@ -1,0 +1,218 @@
+版本 4.0.0-rc.2
+==================
+
+发布日期：2019 年 9 月 27 日
+
+**CodeIgniter4 的 RC.2 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+增强功能
+------------
+
+- 新的属性简化了查询构建器的可测试性,但删除了方法参数(破坏性更改)
+- 数据库、迁移和会话得到加强
+- 大量更小的错误得到纠正
+
+应用变更
+-----------
+
+- Config/Constants、Paths 和一些配置设置发生了变化
+
+消息变更
+---------------
+
+- 无
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+
+- app/
+    - Config/
+        - Boot/* #2241
+        - Constants #2183
+        - Paths #2181
+- public/
+
+- system/
+    - CLI/
+        - BaseCommand #2231
+    - Database/
+        - MySQLi/Connection #2201, 2229
+        - Postgre/
+            - BaseBuilder #2269
+            - Connection #2201
+        - SQLite3/Connection #2201, 2228, 2230
+        - BaseBuilder #2257, 2232, 2269, 2270
+        - BaseConnection #2208, 2213, 2231
+        - Config #2224
+        - Forge #2205
+        - MigrationRunner #2191
+    - Debug/
+        - Exceptions #2262
+    - Encryption/
+        - Encryption #2231
+        - Handlers/BaseHandler #2231
+    - Files/
+        - FileCollection #2265
+    - HTTP/
+        - CURLRequest #2168
+        - IncomingRequest #2265
+        - Request #2253
+        - Response #2253
+    - I18n/
+        - Time #2231
+        - TimeDifference #2231
+    - Images/
+        - Handlers/BaseHandler #2246
+    - RESTful/
+        - ResourcePresenter #2271
+    - Security/
+        - Security #2240
+    - Session/
+        - Session #2197, 2231
+    - Test/
+        - CIDatabaseTestCase #2205
+        - CIDatabaseUnitTestCase #2184
+    - Validation/
+        - FileRules #2265
+        - Validation #2268
+    - View/
+        - Parser #2264
+
+    - Common #2200, 2209, 2261
+    - Model #2231
+
+- tests/_support/
+
+- tests/system/
+    - Commands/
+        - CommandClassTest #2231
+    - Database/
+        - Builder/
+            - GetTest #2232
+                        - CountTest #2269
+                        - DeleteTest #2269
+                        - EmptyTest #2269
+                        - GetTest #2269
+            - GroupTest #2257
+                        - InsertTest #2269
+                        - ReplaceTest #2269
+                        - TruncateTest #2269
+                        - UpdateTest #2269
+        - Live/
+            - EscapeTest #2229
+            - ForgeTest #2201, 2211
+            - GroupTest #2257
+            - MetadataTest #2211
+            - ModelTest #2231
+        - BaseConnectionTest #2229, 2231
+    - Encryption/
+        - EncryptionTest #2231
+    - Helpers/
+        - URLHelperTest #2259
+    - HTTP/
+        - CURLRequestTest #2168
+        - FileCOllectionTest #2265
+        - URITest #2259
+    - I18n/
+        - TimeDifferenceTest #2231
+        - TimeTest #2231
+    - Pager/
+        - pagerTest #2259
+    - RESTful/
+        - ResourcePresenterTest #2271
+    - Session/
+        - SessionTest #2231
+    - View/
+        - ParserTest #2264
+
+- user_guide_src/
+    - concepts/
+        - structure #2221
+    - database/
+        - metadata #2199, 2201, 2208
+        - queries #2208
+        - query_builder #2257, 2232, 2269
+    - dbmgmt/
+        - migration #2190, 2191
+    - extending/
+        - contributing #2221
+    - general/
+        - errors #2221
+    - helpera/
+        - url_helper #2259
+    - incoming/
+        - restful #2189
+        - routing #2221
+    - installation/
+        - troubleshooting #2260
+    - libraries/
+        - encryption #2221
+        - pagination #2216
+        - time #2221
+        - uti #2216
+    - outgoing/
+        - api_responses #2245
+        - view_layouts #2218
+        - view_parser #2218, 2264
+    - testing/
+        - controllers #2221
+        - debugging #2221, 2209
+        - feature #2218, 2221
+        - overview #2221
+    - tutorial/
+        - news_section #2221
+        - static_pages #2221
+
+合并的 PR
+----------
+
+- #2271 修复 ResourcePresenter::setModel()
+- #2270 groupStart() 重构
+- #2269 BaseBuilder 的 testMode() 方法
+- #2268 仅在存在时使用会话验证
+- #2267 测试 setUp 和 tearDown:void
+- #2265 修复多文件上传的验证问题
+- #2264 修复。解析器允许其他扩展
+- #2262 在 Debug/Exceptions 中修复参数类型
+- #2261 修复 lang() 签名
+- #2260 解释 whoops 页面
+- #2259 添加 URI 和 url_helper 测试
+- #2257 对 HAVING 子句进行了几项更新
+- #2253 修复无效参数
+- #2246 GIF 不支持 EXIF
+- #2245 修复类引用参数类型
+- #2241 修复 ini_set 参数类型
+- #2240 在 CSRF 中处理 JSON POST
+- #2232 修复 BaseBuilder getWhere() 错误
+- #2231 为具有 __get 的类添加魔术 __isset
+- #2230 为 SQLite _listTables() 添加转义
+- #2229 MySQLi escapeLikeStringDirect()
+- #2228 从 listTables() 中排除 `sqlite_%`
+- #2224 将 new \Config\Database() 改为 config('Database')
+- #2221 文档修复
+- #2218 纠正拼写错误
+- #2216 更新 uri.rst
+- #2213 在 constrainPrefix 上过滤 listTables 缓存响应
+- #2211 添加 listTable() 测试
+- #2209 添加 trace()
+- #2208 添加 $db->getPrefix()
+- #2205 修复 DBPrefix 上的 empty() 错误
+- #2201 外键列
+- #2200 通知 Kint 别名 dd
+- #2199 向用户指南添加 getForeignKeyData
+- #2187 更新 Session.php
+- #2191 迁移回滚反转
+- #2190 修复 ForeignKeyChecks 的名称
+- #2189 缺失返回
+- #2184 修复“Seeds/”目录的大小写
+- #2183 检查常量的 `defined`
+- #2181 删除复制粘贴的额外文本
+- #2168 修复 CURL 的 'debug' 选项

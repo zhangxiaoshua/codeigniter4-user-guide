@@ -1,0 +1,21 @@
+#############
+版本 4.4.5
+#############
+
+发布日期：2024 年 1 月 27 日
+
+**CodeIgniter4 的 4.4.5 版本发布**
+
+.. contents::
+    :local:
+    :depth: 3
+
+**********
+Bug 修复
+**********
+
+- **QueryBuilder:** 修复了因为 PostgreSQL 上的类型错误，导致 ``updateBatch()`` 方法无法工作的问题。
+
+请查看仓库的
+`CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_
+以获取完整的 Bug 修复列表。

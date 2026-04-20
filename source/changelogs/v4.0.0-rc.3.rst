@@ -1,0 +1,177 @@
+版本 4.0.0-rc.3
+==================
+
+发布日期：2019 年 10 月 19 日
+
+**CodeIgniter4 的 RC.3 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+增强功能
+------------
+
+- 加强了数据库、会话和路由处理。
+- 修复了许多错误和用户指南勘误。
+
+应用变更
+-----------
+
+- App/Config/App 中的新 $CSRFHeaderName 属性
+
+消息变更
+---------------
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+
+- app/
+    - Config/
+        - App #2272
+
+- public/
+
+- system/
+    - Autoloader/
+        - FileLocator #2336
+    - Database/
+        - MySQLi/Forge #2100
+        - Postgre/Forge #2100
+        - SQLite3/Forge #2100
+        - BaseBuilder #2252, 2312
+        - Forge $2100
+        - Migration #2303
+        - MigrationRunner #2303
+    - Debug/
+        - Exceptions #2288
+        - Toolbar/Collectors/
+            - Route #2300
+        - Toolbar #2315
+        - Views/ #2283
+    - Helpers/
+        - inflector_helper #2296
+        - url_helper #2325
+    - HTTP/
+        - CURLRequest #2285, 2305
+        - Files/UploadedFile #2123
+    - Language/en/
+        - Encryption #2311
+        - RESTful #2311
+        - Session #2311
+    - Router/
+        - Exceptions/RedirectException #2338
+        - Router #2308, 2338
+    - Security/
+        - Security #2272, 2279
+    - Session/
+        - Handlers/
+            - DatabaseHandler #2298
+            - FileHandler #2298, 2307
+            - MemcachedHandler #2298
+            - RedisHandler #2298
+        - Session #2339
+    - Validation/
+        - Validation #2284, 2341
+    - View/
+        - View #2324
+    - CodeIgniter #2338
+    - Common #2279
+    - Model #2289, 2332
+
+- tests/README.md #2345
+
+- tests/_support/
+    - Config/
+        - MockAppConfig #2272
+
+- tests/system/
+    - Database/
+        - Builder/
+            - UpdateTest #2295
+        - Live/
+            - ForgeTest #2100
+    - Helpers/
+        - InflectorHelperTest #2296
+        - URLHelperTest #2325
+    - HTTP/
+        - CURLRequestTest #2285
+    - Log/
+        - FileHandlerTest #2346
+    - Security/
+        - SecurityTest #2279
+    - Session/
+        - SessionTest #2339
+    - CommonFunctionsTest #2279
+
+- user_guide_src/
+    - dbmgmt/
+        - forge #2100
+        - migration #2337
+    - general/
+        - common_functions #2279
+        - errors #2338
+        - modules #2290
+    - helpers/
+        - inflector_helper #2296
+    - incoming/
+        - message #2282
+        - restful #2313, 2321, 2333
+        - routing #2327
+    - libraries/
+        - curlrequest #2305
+        - security #2279
+    - models/
+        - model #2316, 2332
+    - outgoing/
+        - table #2337
+
+合并的 PR
+----------
+
+- #2348 CodeIgniter 基金会获得版权
+- #2346 修复 FilerHandlerTest.php 奇怪的地方
+- #2345 测试自述文件优化
+- #2344 设置 vs 建立
+- #2343 用户指南小修复。修复类名和代码区域
+- #2341 简化 Validation::getErrors()
+- #2339 修复当值为 (int) 0 时 Session::get('key') 返回 null
+- #2338 还原 RedirectException 更改
+- #2337 指南:小的语法校正
+- #2336 正确清理 Windows 中的命名空间
+- #2333 指南:RESTful 表格式
+- #2332 在实际数据后更改 after 方法
+- #2328 更新应用程序结构
+- #2327 纠正旅游 UG 页面
+- #2325 修复 url_title() 函数在含变音符号时的错误
+- #2324 渲染工具栏调试切换
+- #2321 更新 RESTful 用户指南
+- #2316 将 getValidationRules() 添加到模型 UG 页面
+- #2315 增强 Toolbar::renderTimeline
+- #2313 RESTful 用户指南清理
+- #2312 BaseBuilder 变量类型修复
+- #2311 将所有语言返回转换为单引号
+- #2308 修复额外的自动路由斜杠错误
+- #2307 解决会话保存处理程序问题
+- #2305 修复 curl 调试错误
+- #2303 如果定义则使用迁移类中的 DBGroup 变量
+- #2300 在通过 _remap 计算方法名称时,工具栏的 Routes 收集器不应该死亡
+- #2298 修复 session_regenerate 问题
+- #2296 向 Inflector 辅助函数添加 counted()
+- #2295 更全面地测试 Builder 类中的 set() 方法
+- #2290 修复代码模块文档中关于 psr4 命名空间配置的部分
+- #2289 不要以只读方式限制模型对属性的访问
+- #2288 修复 Debug/Exceptions 类中的行编号
+- #2285 修复 CURLRequest 类中 Host 标头的错误
+- #2284 修复验证时 getErrors() 的错误
+- #2283 热修复:将收集器 _*.tpl.php 重命名为 _*.tpl
+- #2282 修复 Message 类的用户指南
+- #2279 CSRF 参数清理中的错误
+- #2272 处理 X-CSRF-TOKEN - CSRF
+- #2252 批量更新 Where 重置
+- #2123 WIP 修复 store() 默认值错误
+- #2100 在为 MySQLi 创建之前验证数据库是否存在

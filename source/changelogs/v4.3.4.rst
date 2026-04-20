@@ -1,0 +1,53 @@
+版本 4.3.4
+#############
+
+发布日期：2023 年 4 月 27 日
+
+**CodeIgniter4 的 4.3.4 版本发布**
+
+.. contents::
+    :local:
+    :depth: 3
+
+不兼容变更
+**********
+
+行为变化
+================
+
+.. _v434-redirect-status-code:
+
+重定向状态码
+--------------------
+
+- 由于一个错误,在以前的版本中,当使用 HTTP/1.1 或更高版本时,即使指定了状态码,实际重定向响应的状态码也可能会改变。例如,对于 GET 请求,302 会更改为 307;对于 POST 请求,307 和 302 会更改为 303。
+- 从这个版本开始,如果在 :ref:`redirect <response-redirect-status-code>` 中指定了状态码,该代码将始终在响应中使用。
+- 当使用 HTTP/1.1 或更高版本时,GET 请求的默认代码已更正为 302。
+- 当使用 HTTP/1.1 或更高版本时,HEAD 和 OPTIONS 请求的默认代码已更正为 307。
+- 在 ``$routes->addRedirect()`` 中,默认指定 302。因此,当你不指定状态码时,总是会使用 302。在以前的版本中,302 可能会更改。
+
+.. _v434-forge-modifycolumn:
+
+Forge::modifyColumn()
+---------------------
+
+- :ref:`$forge->modifyColumn() <db-forge-modifycolumn>` 已修复。
+  由于一个错误,在以前的版本中,SQLite3/Postgres/SQLSRV 可能会不可预测地更改 ``NULL``/``NOT NULL``。
+- 在以前的版本中,当你不指定 ``null`` 键时,OCI8 驱动程序不会更改 ``NULL``/``NOT NULL``。
+- 现在在所有数据库驱动程序中,如果你不指定 ``null`` 键, ``$forge->modifyColumn()`` 始终设置为 ``NULL``。
+- ``NULL``/``NOT NULL`` 的更改可能仍然出人意料,建议总是指定 ``null`` 键。
+
+弃用功能
+************
+
+- **文本辅助函数:** :php:func:`random_string()` 的类型 ``basic``、``md5`` 和
+  ``sha1`` 已弃用。它们不是加密安全的。
+
+Bug 修复
+**********
+
+- **CURLRequest:** 修复了一个错误,其中响应类在请求之间共享。
+
+请查看仓库的
+`CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_
+以获取完整的 Bug 修复列表。

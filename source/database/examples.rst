@@ -1,121 +1,74 @@
-##################################
-Database Quick Start: Example Code
-##################################
+###########################
+快速入门：使用示例
+###########################
 
-The following page contains example code showing how the database class
-is used. For complete details please read the individual pages
-describing each function.
+本页面包含展示数据库类如何使用的示例代码。更多详细信息，请阅读描述各个函数的独立页面。
 
-Initializing the Database Class
+.. note:: CodeIgniter 不支持在表名和列名中使用点号（``.``）。
+    从 v4.5.0 版本开始，数据库名称支持使用点号。
+
+.. contents::
+    :local:
+    :depth: 2
+
+初始化数据库类
 ===============================
 
-The following code loads and initializes the database class based on
-your :doc:`configuration <configuration>` settings::
+以下代码根据你的 :doc:`配置 <configuration>` 设置加载并初始化数据库类：
 
-	$db = \Config\Database::connect();
+.. literalinclude:: examples/001.php
 
-Once loaded the class is ready to be used as described below.
+加载后，该类即可按以下所述方式使用。
 
-Note: If all your pages require database access you can connect
-automatically. See the :doc:`connecting <connecting>` page for details.
+.. note:: 如果你所有的页面都需要数据库访问，你可以自动连接。
+    详情请参阅 :doc:`连接数据库 <connecting>` 页面。
 
-Standard Query With Multiple Results (Object Version)
+标准查询（多结果，对象版本）
 =====================================================
 
-::
+.. literalinclude:: examples/002.php
 
-	$query = $db->query('SELECT name, title, email FROM my_table');
-	$results = $query->getResult();
+| 上述 ``getResult()`` 函数返回一个 **对象** 数组。
+| 示例：``$row->title``
 
-	foreach ($results as $row)
-	{
-		echo $row->title;
-		echo $row->name;
-		echo $row->email;
-	}
-	
-	echo 'Total Results: ' . count($results);
-
-The above getResult() function returns an array of **objects**. Example:
-$row->title
-
-Standard Query With Multiple Results (Array Version)
+标准查询（多结果，数组版本）
 ====================================================
 
-::
+.. literalinclude:: examples/003.php
 
-	$query = $db->query('SELECT name, title, email FROM my_table');
-	$results = $query->getResultArray();
+| 上述 ``getResultArray()`` 函数返回一个关联数组的数组。
+| 示例：``$row['title']``
 
-	foreach ($results as $row)
-	{
-		echo $row['title'];
-		echo $row['name'];
-		echo $row['email'];
-	}
-
-The above getResultArray() function returns an array of standard array
-indexes. Example: $row['title']
-
-Standard Query With Single Result
+标准查询（单个结果）
 =================================
 
-::
+.. literalinclude:: examples/004.php
 
-	$query = $db->query('SELECT name FROM my_table LIMIT 1');
-	$row = $query->getRow();
-	echo $row->name;
+上述 ``getRow()`` 函数返回一个 **对象**。示例：``$row->name``
 
-The above getRow() function returns an **object**. Example: $row->name
-
-Standard Query With Single Result (Array version)
+标准查询（单个结果，数组版本）
 =================================================
 
-::
+.. literalinclude:: examples/005.php
 
-	$query = $db->query('SELECT name FROM my_table LIMIT 1');
-	$row = $query->getRowArray();
-	echo $row['name'];
+上述 ``getRowArray()`` 函数返回一个 **关联数组**。示例：
+``$row['name']``。
 
-The above getRowArray() function returns an **array**. Example:
-$row['name']
-
-Standard Insert
+标准插入
 ===============
 
-::
+.. literalinclude:: examples/006.php
 
-	$sql = "INSERT INTO mytable (title, name) VALUES (".$db->escape($title).", ".$db->escape($name).")";
-	$db->query($sql);
-	echo $db->getAffectedRows();
-
-Query Builder Query
+查询构建器查询
 ===================
 
-The :doc:`Query Builder Pattern <query_builder>` gives you a simplified
-means of retrieving data::
+:doc:`查询构建器 <query_builder>` 为你提供了一种简化的数据检索方式：
 
-	$query = $db->table('table_name')->get();
-	
-	foreach ($query->getResult() as $row)
-	{
-		echo $row->title;
-	}
+.. literalinclude:: examples/007.php
 
-The above get() function retrieves all the results from the supplied
-table. The :doc:`Query Builder <query_builder>` class contains a full
-compliment of functions for working with data.
+上述 ``get()`` 函数从指定的表中检索所有结果。:doc:`查询构建器 <query_builder>` 类包含一套完整的用于处理数据的函数。
 
-Query Builder Insert
+查询构建器插入
 ====================
 
-::
-
-	$data = array(
-		'title' => $title,
-		'name' => $name,
-		'date' => $date
-	);
-	
-	$db->table('mytable')->insert($data);  // Produces: INSERT INTO mytable (title, name, date) VALUES ('{$title}', '{$name}', '{$date}')
-
+.. literalinclude:: examples/008.php

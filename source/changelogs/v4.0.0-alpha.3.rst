@@ -1,0 +1,385 @@
+版本 4.0.0-alpha.3
+=====================
+
+发布日期：2018 年 11 月 30 日
+
+**CodeIgniter4 的下一个内测版本**
+
+.. contents::
+    :local:
+    :depth: 2
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有对应的 PR 编号:
+
+- admin/
+    - framework/* #1553
+    - starter/* #1553
+    - docbot #1553
+    - release* #1484,
+    - pre-commit #1388
+    - README.md #1553
+    - setup.sh #1388
+
+- application /
+    - Config/
+        - Autoload #1396, #1416
+        - Mimes #1368, #1465
+        - Pager #622
+        - Services #1469
+    - Filters/Honeypot #1376
+    - Views/
+        - errors/* #1415, #1413, #1469
+        - form.php 已移除 #1442
+
+- public /
+    - index.php #1388, #1457
+
+- system /
+    - Autoloader/
+        - Autoloader #1547
+        - FileLocator #1547, #1550
+    - Cache/
+        - Exceptions/CacheException #1525
+        - Handlers/FileHandler #1547, #1525
+        - Handlers/MemcachedHandler #1383
+    - CLI/
+        - CLI #1432, #1489
+    - Commands/
+        - Database/
+            - CreateMigration #1374, #1422, #1431
+            - MigrateCurrent #1431
+            - MigrateLatest #1431
+            - MigrateRollback #1431
+            - MigrateStatus #1431
+            - MigrateVersion #1431
+        - Sessions/CrateMigration #1357
+    - Config/
+        - AutoloadConfig #1416
+        - BaseService #1469
+        - Mimes #1453
+        - Services #1180, #1469
+    - Database/
+        - BaseBuilder #1335, #1491, #1522
+        - BaseConnection #1335, #1407, #1491, #1522
+        - BaseResult #1426
+        - Config #1465, #1469, #1554
+        - Forge #1343, #1449, #1470, #1530
+        - MigrationRunner #1371
+        - MySQLi/Connection #1335, #1449
+        - MySQLi/Forge #1343, #1344, #1530
+        - MySQLi/Result #1530
+        - Postgre/Connection #1335, #1449
+        - Postgre/Forge #1530
+        - SQLite3/Connection #1335, #1449
+        - SQLite3/Forge #1470, #1547
+    - Debug
+        - Exceptions #1500
+        - Toolbar #1370, #1465, #1469, #1547
+        - Toolbar/Views/toolbar.tpl #1469
+    - Email/
+        - Email #1389, #1413, #1438, #1454, #1465, #1469, #1547
+    - Events/
+        - Events #1465, #1469, #1547
+    - Files/
+        - File #1399, #1547
+    - Format/
+        - XMLFormatter #1471
+    - Helpers/
+        - array_helper #1412
+        - filesystem_helper #1547
+    - Honeypot/
+        - Honeypot #1460
+    - HTTP/
+        - CURLRequest #1547, #1498
+        - DownloadResponse #1375
+        - Exceptions/DownloadException #1405
+        - Files/FileCollection #1506
+        - Files/UploadedFile #1335, #1399, #1500, #1506, #1547
+        - IncomingRequest #1445, #1469, #1496
+        - Message #1497
+        - RedirectResponse #1387, #1451, #1464
+        - Response #1456, #1472, #1477, #1486, #1504, #1505, #1497, #622
+        - ResponseInterface #1384
+        - UploadedFile #1368, #1456
+        - URI #1213, #1469, #1508
+    - Images/Handlers/
+        - ImageMagickHandler #1546
+    - Language/
+        - en/Cache #1525
+        - en/Database #1335
+        - en/Filters #1378
+        - en/Migrations #1374
+        - Language #1480, #1489
+    - Log/
+        - Handlers/FileHandler #1547
+    - Pager/
+        - Pager #1213, #622
+        - PagerInterface #622
+        - PagerRenderer #1213, #622
+        - Views/default_full #622
+        - Views/default_head #622
+        - Views/default_simple #622
+    - Router/
+        - RouteCollection #1464, #1524
+        - RouteCollectionInterface #1406, #1410
+        - Router #1523, #1547
+    - Session/Handlers/
+        - BaseHandler #1180, #1483
+        - DatabaseHandler #1180
+        - FileHandler #1180, #1547
+        - MemcachedHandler #1180
+        - RedisHandler #1180
+    - Test/
+        - CIUnitTestCase #1467
+        - FeatureTestCase #1427, #1468
+        - Filters/CITestStreamFilter #1465
+    - Validation /
+        - CreditCardRules #1447, #1529
+        - FormatRules #1507
+        - Rules #1345
+        - Validation #1345
+    - View/
+        - Filters #1469
+        - Parser #1417, #1547
+        - View #1357, #1377, #1410, #1547
+    - bootstrap #1547
+    - CodeIgniter #1465, #1505, #1523, 2047b5a, #1547
+    - Common #1486, #1496, #1504, #1513
+    - ComposerScripts #1469, #1547
+    - Controller #1423
+    - Entity #1369, #1373
+    - Model #1345, #1380, #1373, #1440
+
+- tests /
+    - _support/
+        - HTTP/MockResponse #1456
+        - _bootstrap.php #1397, #1443
+    - Cache/Handlers/
+        - FileHandlerTest #1547, #1525
+        - MemcachedHandlerTest #1180, #1383
+        - RedisHandlerTest #1180, #1481
+    - CLI/
+        - CLITest #1467, #1489
+    - Commands/
+        - SessionCommandsTest #1455
+    - Database/Live/
+        - ConnectTest #1554
+        - ForgeTest #1449, #1470
+    - HTTP/
+        - CURLRequestTest#1498
+        - Files/FileCOllectionTest #1506
+        - Files/FileMovingTest #1424
+        - DownloadResponseTest #1375
+        - IncomingRequestTest #1496
+        - RedirectResponseTest #1387, #1456
+        - ResponseCookieTest #1472, #1509
+        - ResponseSendTest #1477, #1486, #1509
+        - ResponseTest #1375, #1456, #1472, #1486, #622
+        - URITest #1456, #1495
+    - Helpers/
+        - DateHelperTest #1479
+    - I18n/
+        - TimeTest #1467, #1473
+    - Language/
+        - LanguageTest #1480
+    - Log/
+        - FileHandlerTest #1425
+    - Pager/
+        - PagerRendererTest #1213, #622
+        - PagerTest #622
+    - Router/
+        - RouteCollectionTest #1438, #1524
+        - RouterTest #1438, #1523
+    - Session/
+        - SessionTest #1180
+    - Test/
+        - BootstrapFCPATHTest #1397
+        - FeatureTestCase #1468
+        - TestCaseEmissionsTest #1477
+        - TestCaseTest #1390
+    - Throttle/
+        - ThrottleTest #1398
+    - Validation/
+        - FormatRulesTest #1507
+    - View/
+        - ParserTest #1335
+    - CodeIgniterTest #1500
+    - CommonFunctionsSendTest #1486, #1509
+    - CommonFunctionsTest #1180, #1486, #1496
+
+- user_guide_src /source/
+    - changelogs/ #1385, #1490, #1553
+    - concepts/
+        - autoloader #1547
+        - security #1540
+        - services #1469
+        - structure #1448
+    - database/
+        - queries #1407
+    - dbmgmt/
+        - forge #1470
+        - migration #1374, #1385, #1431
+        - seeds #1482
+    - extending/
+        - core_classes #1469
+    - helpers/
+        - form_helper #1499
+    - installation/
+        - index #1388
+    - libraries/
+        - caching #1525
+        - pagination #1213
+        - validation #27868b, #1540
+    - models/
+        - entities #1518, #1540
+    - outgoing/
+        - response #1472, #1494
+    - testing/
+        - overview #1467
+    - tutorial/
+        - create_news_item #1442
+        - static_pages #1547
+
+- /
+    - composer.json #1388, #1418, #1536, #1553
+    - README.md #1553
+    - spark 2047b5a
+    - .travis.yml #1394
+
+合并的 PR
+----------
+
+- #1554 Service 实例
+- #1553 Admin/脚本
+- #1550 在 FileLocator 中删除注释的 CLI::newLine($tempFiles)
+- #1549 在 Database/Seeds 目录中使用 .gitkeep 代替 .gitignore
+- #1547 将文件存在更改为是文件
+- #1546 ImageMagickHandler::__construct...
+- #1540 更新验证类用户指南
+- #1530 数据库性能改进:尽可能使用 foreach()
+- 2047b5a 使用 spark 时不运行过滤器。
+- #1539 在 CreditCardRules 中删除 mb_* (mb 字符串使用)
+- #1536 composer.json 中的 ext-json
+- #1525 删除不需要的 try {} catch {}
+- #1524 用 'websafe' 选项测试路由资源
+- #1523 检查匹配的路由正则是否被过滤
+- #1522 在 BaseBuilder 中添加 property_exists 检查
+- #1521 .gitignore 清理
+- #1518 小错误修正:将 setCreatedOn 改为 setCreatedAt
+- #1517 将每个目录中的 .htaccess 从 writable/{directory} 移动到 writable/
+- #1513 更安全的重定向
+- #1509 删除未使用的 use 语句
+- #1508 在 URI::setScheme() 调用中删除重复的 strtolower() 调用
+- #1507 修复用 "," 分隔的多个 "empty" 字符串被标记为有效电子邮件
+- #1506 充实 HTTP/File 单元测试
+- #1505 直到所有 Response 完成之前不退出
+- 27868b 为 {field} 和 {param} 占位符添加缺失的文档
+- #1504 还原 RedirectResponse 更改
+- #1500 忽略用 @ 禁止的错误
+- #1499 修复 form_helper 的 set_value 说明
+- #1498 为 CURLRequest 添加辅助方法
+- #1497 移除未使用的 RedirectException
+- #1496 修复 Common::old()
+- #1495 添加 URI 段测试
+- #1494 用户指南中的方法命名
+- #1491 错误日志记录
+- #1490 变更日志重构
+- #1489 为 CLI 添加 ::strlen()
+- #1488 从其他位置加载语言字符串
+- #1486 测试 RedirectResponse 问题报告
+- #1484 缺少斜杠
+- #1483 Session\Handlers\BaseHandler.php 中的小拼写错误
+- #1482 修复 Seeds 文档中的查询绑定问题
+- #1481 RedisHandler 测试清理
+- #1480 修复语言关键文件混淆
+- #1479 修复另一个时间测试
+- #1477 添加 Response 发送测试
+- #1475 纠正 Forge::addField() 的 phpdocs
+- #1473 将另一个时间测试模糊化
+- #1472 HTTP\Response cookie 测试和缺失功能
+- #1471 在 XMLFormatter::format() 中删除未使用的局部变量 $result
+- #1470 允许使用数组字段约束创建表
+- #1469 对保护的/公共函数使用 static:: 而不是 self:\:
+- #1468 修复 FeatureTestCase 测试输出缓冲
+- #1467 提供容差时间测试
+- #1466 修正 BaseBuilder 的 phpdocs
+- #1465 对保护和公共属性使用 static:: 而不是 self:\:
+- #1464 删除未使用的 use 语句
+- #1463 修复其余的 bcit-ci 引用
+- #1461 拼写错误修正:donload -> download
+- #1460 在 HoneyPot 中删除不需要的三元检查
+- #1457 在 public/index.php 中使用 $paths->systemDirectory
+- #1456 加强 HTTP URI 和 Response 测试
+- #1455 取消忽略 app/Database/Migrations 目录
+- #1454 在 Email::getEncoding() 的循环中添加缺失的 break;
+- #1453 BugFix 如果扩展只有一个 mime 类型
+- #1451 在 RedirectResponse 中删除不需要的 $session->start() 检查
+- #1450 phpcbf:一次修复所有
+- #1449 简化从 mysql/mariadb 获取 indexData 的方式
+- #1448 文档:添加缺失的应用结构
+- #1447 在循环卡片以获取卡信息的 CreditCardRules 中添加缺失的 break;
+- #1445 在 HTTP\IncomingRequest 中使用现有的 is_cli() 函数
+- #1444 关于重组库管理的文档 (4/4)
+- #1443 修复未捕获的单元测试输出
+- #1442 从 app/View/ 中移除表单视图以及在创建新项目教程中使用表单辅助函数
+- #1440 访问模型最后插入的 ID
+- #1438 尾部库组织名称 (3/4)
+- #1437 在大多数 php 文档中替换库组织名称 (2/4)
+- #1436 在文档中更改 github 组织名称 (1/4)
+- #1432 使用 mb_strlen 获取列长度
+- #1431 从命令迁移中无法调用 run() 方法并传参
+- #1427 修复 FeatureTestCase 中的“选项”请求调用参数
+- #1416 Database\BaseResult 中的性能改进
+- #1425 确保 FileHandlerTest 使用 MockFileHandler
+- #1424 修复 FileMovingTest 遗留问题
+- #1423 修复 Controller 验证使用错误
+- #1422 修复 Migrations.classNotFound
+- #1418 规范化 composer.json
+- #1417 修复 Parser::parsePairs 总是转义
+- #1416 在 application\Config\Autoload 中删除 $psr4['Tests\Support'] 定义
+- #1415 删除不需要的 "defined('BASEPATH')..."
+- #1413 在所有 uniqid() 用法中设置 more_entropy = true
+- #1412 修复 array_helper 中的 function_exists() 拼写错误
+- #1411 在 View::render() 的循环中添加缺失的 break;
+- #1410 修复 2d0b325 提交导致 spark serve 不工作
+- #1407 在 BaseConnection->prepare() 中添加缺失的 initialize() 调用检查
+- #1406 为 RouteCollectionInterface 添加缺失的参数
+- #1405 修复 DownloadException 中使用的语言字符串
+- #1402 纠正用户指南中的类命名空间
+- #1399 允许在 guessExtension 中使用类型提示
+- #1398 调整节流测试
+- #1397 纠正测试中 _support/_bootstrap.php 的 FCPATH 设置
+- #1396 仅在“testing”环境中为“Tests\Support”命名空间注册 PSR4
+- #1395 文档中使用短数组语法
+- #1394 将 php 7.3 添加到 travis 配置
+- #1390 修复测试执行时输出 "Hello"
+- #1389 使电子邮件文件名大写
+- #1388 提交时自动 phpcs 修复
+- #1387 重定向到命名路由
+- #1385 修复迁移页面;更新变更日志
+- #1384 为 ResponseInterface 添加缺失常量
+- #1383 修复 MemcachedHandler::__construct() 中的 TypeError
+- #1381 删除未使用的 use 语句
+- #1380 改进 count(),使用真值检查
+- #1378 更新 Filters 语言文件
+- #1377 修复 monolog 会导致错误
+- #1376 修复无法在 App\Filters\Honeypot 中使用 Honeypot 类,因为已经在使用
+- #1375 根据 RFC 6266 给下载一个标头
+- #1374 缺失的功能迁移。
+- #1373 关闭数据库插入/保存的类型转换
+- #1371 更新编码样式中的方法名称
+- #1370 工具栏需要日志记录。修复 #1258
+- #1369 移除不可见字符
+- #1368 UploadedFile->guessExtenstion()...
+- #1360 删除 --cached php_errors.log 文件
+- #1357 更新模板文件与 .php 不兼容
+- #1345 is_unique 尝试连接默认数据库而不是在 DBGroup 中定义的数据库
+- #1344 不对不必要的表选项加引号
+- #1343 避免在约束中添加两个单引号
+- #1335 审查和改进 MySQLi、Postgre 和 SQLite 数据库驱动
+- #1213 在分页中使用 URI 段作为页码
+- #1180 在 HTTP\Request 实例中获取 IP 地址
+- #622 为分页添加头部链接

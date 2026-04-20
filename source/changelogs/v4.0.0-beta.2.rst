@@ -1,0 +1,277 @@
+版本 4.0.0-beta.2
+====================
+
+发布日期：2019 年 4 月 4 日
+
+.. contents::
+    :local:
+    :depth: 2
+
+亮点
+----------
+
+- 大量修复和改进,尤其是针对 Model 和测试类
+- Model 现在需要主键
+- 生成的 API 文档可在 https://codeigniter4.github.io/api/ 访问
+- 验证规则得到增强
+- .htaccess 加强
+
+新消息
+------------
+
+- Database.noPrimaryKey、forFindColumnHaveMultipleColumns、Database.forEmptyInputGiven
+
+应用变更
+-----------
+
+- 更新了 app/Config/Events
+- 添加了 app/Controllers/BaseController
+- 添加了测试文件夹用于单元测试
+- 添加了 phpunit.xml.dist 用于单元测试配置
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- .htaccess #1900
+
+- app/
+    - Config/
+        - Events #1856
+    - Controllers/
+        - BaseController #1847
+        - Home #1847
+
+- contributing/
+    - README.rst #1846
+    - styleguide #1872
+
+- contributing.md #1846
+
+- phpdoc.dist.xml #1872
+
+- system/
+    - Autoloader/
+        - FileLocator #1860
+    - Cache/Handlers/
+        - FileHandler #1895
+        - MemcachedHandler #1895
+        - PredisHandler #1895
+        - RedisHandler #1863, #1895
+        - WincacheHandler #1895
+    - CLI/
+        - CLI #1891, #1910
+    - Commands/
+        - Server/Serve #1893
+        - Utilities/Routes #1859
+    - Config/
+        - BaseConfig #1811
+        - Routes #1847, #1850
+    - Database/
+        - BaseBuilder $1776, #1902
+        - BaseConnection #1899
+        - Forge #1844, #1899
+        - MigrationRunner #1860, #1865
+        - MySQLi/Connection #1896
+        - MySQLi/Forge #1899
+        - Postgre/Builder #1902
+        - Postgre/Forge #1899
+        - Query #1805, #1771
+        - SQLite3/Builder #1902
+        - SQLite3/Forge #1899
+    - Debug/
+        - Toolbar/Collectors/History #1869
+        - Toolbar #1897
+    - Events/
+        - Events #1867
+    - Exceptions/
+        - ModelException #1829
+        - PageNotFoundException #1844
+    - Files/
+        - File #1809, #1854
+    - Helpers/
+        - date_helper #d08b68
+        - form_helper #1803
+        - html_helper #1803
+        - number_helper #d08b68, #1803
+        - security_helper #d08b68
+        - text_helper #d08b68, #1803
+        - url_helper #d08b68, #1803
+        - xml_helper #1803
+    - Honeypot/
+        - Honeypot #1894
+    - HTTP/
+        - Header #1769
+        - IncomingRequest #1831
+    - Language/en/
+        - Database #1829, #1861, #1902
+    - Router/
+        - RouteCollection #1769
+        - Router #1839, #1882
+    - Session/
+        - Session #1769
+    - Test/
+        - ControllerTester #1769, #1848, #1855
+        - DOMParser #1848
+    - Validation/
+        - FormatRules #1762, #1863
+        - Rules #1791, #1814, #1818, #1862
+        - Validation #1769
+        - Views/list #1828
+    - View/
+        - Filters #1769
+        - Parser #1769
+        - View #1769, #1827
+    - CodeIgniter #1769, #1804, #1590
+    - Common #1802, #895ae0
+    - ComposerScripts #1804
+    - Controller #1769, #1850
+    - Entity #1769, #1804
+    - Model #1793, #1769, #1804, #1808, #1812, #1813, #1817, #1829, #1746, #1861
+
+- tests/system/
+    - Cache/
+        - Handlers/
+            - FileHandlerTest #1796, #1895
+            - MemcachedHandlerTest #1895
+            - RedisHandlerTest #1895
+        - CacheFactoryTest #1796
+    - CLI/
+        - CLITest #1910
+    - Config/
+        - BaseConfigTest #1811
+        - ConfigTest #1811
+    - Database/
+        - Builder/EmptyTest #1902
+        - Builder/SelectTest #1902
+        - Live/ModelTest #1817, #1829, #1861
+        - Live/WhereTest #1906
+    - Events/
+        - EventsTest #1867
+    - HTTP/
+        - ContentSecurityPolicyTest #1848
+    - Router/
+        - RouteCollectionTest #1822, #1912, #1913
+    - Test/
+        - ControllerTesterTest #1848, #1855
+        - DOMParserTest #1848
+    - Validation/
+        - FormatRulesTest #1762
+        - RulesTest #1791
+    - View/
+        - ViewTest #1827, #1836
+    - ControllerTest #1850
+
+- user_guide_src/
+    - cli/
+        - cli_commands #1777
+        - cli_library #1892, #1910
+    - concepts/
+        - services #1811
+    - database/
+        - examples #1794
+    - dbmgmt/
+        - forge #1844, #1899
+        - migration #1860, #1865
+    - extending/
+        - basecontroller #1847
+        - core_classes #1847
+    - general/
+        - common_functions #1802, #1895
+    - helpers/
+        - number_helper #d08b68
+        - url_helper #1803
+    - incoming/
+        - routing #1908
+    - libraries/
+        - caching #1895
+        - files #1790, #1854
+        - pagination #1823
+        - sessions #1843
+        - validation #1814, #1828, #1862
+    - models/
+        - models #1817, #1820, #1829, #1746, #1861
+    - outgoing/
+        - view_layouts #1827
+    - testing/
+        - controllers #1848
+
+合并的 PR
+----------
+
+- #1913 更多覆盖重写的 RouteCollection 测试。关闭 #1692
+- #1912 额外的 RouteCollectionTests
+- #1910 为 CLI 库添加了 print 方法,以便在同一行上多次打印
+- #1908 在用户指南中添加过滤器参数
+- #1906 与 #1775 相关的子查询测试用例
+- #1902 BaseBuilder 修正
+- #1900 为更好的安全性和缓存更新 .htaccess
+- #1899 数据库 Forge 修正
+- #1897 针对 #1779 的工具栏修复
+- #1896 Mysql 连接使用 SSL 证书的问题 (#1219)
+- #1894 修正拼写错误
+- #1893 用 remove escapeshellarg() 修复 spark serve
+- #1892 在用户指南中添加 CLI 背景颜色列表
+- #1891 允许 CLI::strlen 为空参数
+- #1886 修复问题 #1880,修复了一些拼写错误和更新了代码风格
+- #1882 与 #1541 相关的路由器更改
+- #1873-1889 文档:移动命名空间声明和添加缺失的类 docblocks
+- #1872 文档:修复 phpdoc 配置
+- #1871 不匹配的缓存库 `get()` 返回 null
+- #1869 History::SetFiles 检查 #1778
+- #1863 按模块进行拼写更改
+- #1861 新的 Find Column 方法 与 #1619 相关
+- #1860 Migrationrunner 使用自动加载程序
+- #1867 事件现在应该可以与任何可调用项一起使用了。修复 #1835
+- #1865 解决定义中的 MigrationRunner 问题
+- #1862 required_with 和 required_without 定义更改
+- #1859 在路由列表中忽略回调
+- #1858 DB 模块中的拼写更正
+- #1856 在 pre_system 事件上确保 ob_get_level() > 0 时 ob_end_flush()
+- #1855 修复:ControllerTester::execute。修复 #1834
+- #1854 File::move 现在会为重定位的文件返回新的文件实例。修复 #1782
+- #1851 用根 CI4 版本替换旧的 CI3 .gitignore
+- #1850 安全可路由的控制器方法
+- #1848 测试:修复和测试 Test/ControllerTest,已测试
+- #1847 默认将 Controller 扩展到 BaseController
+- #1846 修复贡献链接
+- #1844 Model 修复
+- #1843 替换 CI3 $this->input 引用
+- #1842 异常 'forPageNotFound' 缺少默认值
+- #1839 不要在 to 路由中将斜杠替换为反斜杠
+- #1836 测试:改进 View\View 覆盖率
+- #1831 修复一些 PHPDoc 注释错误
+- #1829 改进:Model 现在需要主键。这部分是为了保持代码...
+- #1828 修复:从验证视图中删除引导样式。
+- #1827 修复:向视图库添加 include 方法来渲染视图片段... 视图。
+- #1823 文档:在 Pagination 类中删除遗留的 Bootstrap 引用
+- #1822 测试:增强 RouteCollection 覆盖率
+- #1820 修复:在 model.rst 中正确的 sphinx 错误
+- #1819 改进:使用 phpDocumentor 添加 apibot 用于 API 文档
+- #1818 改进:在 exact_length 规则中改进代码
+- #1817 改进:引入 Model setValidationMessage 函数
+- #895ae0 修复:每当使用旧命令时都启动会话
+- #1814 增强:extended exact_length[1,3,5]
+- #1813 修复:Model::save 对于早期 PR 的修复
+- #1812 测试:改进 Filters 覆盖率
+- #1811 测试:改进 Config 模块覆盖率
+- #1809 修复文件移动失败。修复 #1785
+- #1808 修复:修复 save 方法的返回值
+- #1805 文档:Query 类更改
+- #1804 文档:一些基本功能更改
+- #1803 文档:一些辅助函数更改
+- #1802 文档:通用函数更正
+- #1796 测试:改进 Cache 覆盖率
+- #1794 替换不存在的 “getAffectedRows”
+- #1793 设置 Model->chunk 返回类型
+- #1791 修复:在 Validation\Rules 中删除 is_numeric 测试
+- #d08b68 在缺少 UserAgent 的 ControllerTester 中修复
+- #1790 根据问题 #1781 中提到的修正文档中的拼写错误
+- #1777 向示例添加 CLI 命名空间
+- #1776 修复:仅替换字段名称中的最后一个操作符
+- #1771 修复:matchSimpleBinds 中的拼写错误
+- #1769 方法和拼写更正
+- #1762 修复:decimal 规则。它不应该接受整数吗?
+- #1746 改进:更新 Model,选择性更新 created_at/updated_at 字段。
+- #1590 改进:增强 404Override

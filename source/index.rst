@@ -1,95 +1,124 @@
 #######################
-CodeIgniter4 User Guide
+CodeIgniter4 用户指南
 #######################
 
-- :doc:`License Agreement <license>`
-- :doc:`Change Log <changelog>`
+.. toctree::
+    :includehidden:
+    :titlesonly:
 
-.. contents::
-   :local:
-   :depth: 2
+    intro/index
 
-*******
-Welcome
-*******
+***************
+入门指南
+***************
 
 .. toctree::
-	:includehidden:
-        :titlesonly:
+    :maxdepth: 2
+    :titlesonly:
 
-        intro/index
-
-************
-Installation
-************
-
-.. toctree::
-	:includehidden:
-	:maxdepth: 2
-	:titlesonly:
-
-	installation/index
+    installation/index
 
 ********
-Tutorial
+开发指南
 ********
 
 .. toctree::
-	:includehidden:
-	:titlesonly:
+    :includehidden:
+    :titlesonly:
 
-    	tutorial/index
+    guides/index
 
-*********************
-CodeIgniter4 Overview
-*********************
-.. toctree::
-   :titlesonly:
-
-   concepts/index
-
-**************
-General Topics
-**************
+*************************
+概览与常规主题
+*************************
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	general/index
-
-*****************
-Library Reference
-*****************
+    concepts/index
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	libraries/index
-
-******************
-Database Reference
-******************
-
-.. toctree::
-	:titlesonly:
-
-	database/index
+    general/index
 
 ****************
-Helper Reference
+请求处理
 ****************
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	helpers/index
-
-
-***************************
-Contributing to CodeIgniter
-***************************
+    incoming/index
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-   	contributing/index
+    outgoing/index
+
+******************
+数据库操作
+******************
+
+.. toctree::
+    :titlesonly:
+
+    database/index
+
+.. toctree::
+    :titlesonly:
+
+    models/index
+
+.. toctree::
+    :titlesonly:
+
+    dbmgmt/index
+
+*******************
+类库与辅助函数
+*******************
+
+.. toctree::
+    :titlesonly:
+
+    libraries/index
+
+.. toctree::
+    :titlesonly:
+
+    helpers/index
+
+***************
+进阶主题
+***************
+
+.. toctree::
+    :titlesonly:
+
+    testing/index
+
+.. toctree::
+    :titlesonly:
+
+    cli/index
+
+.. toctree::
+    :titlesonly:
+
+    extending/index
+
+.. toctree::
+    :hidden:
+
+    license
+    changelogs/index
+
+*****************
+官方扩展包
+*****************
+
+.. toctree::
+    :titlesonly:
+
+    libraries/official_packages

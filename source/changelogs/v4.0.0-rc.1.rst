@@ -1,0 +1,246 @@
+版本 4.0.0-rc.1
+==================
+
+发布日期：2019 年 9 月 3 日
+
+**CodeIgniter4 的 RC.1 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+增强功能
+------------
+
+- CI3 电子邮件移植到 CI4
+- 添加加密(基本)
+- 迁移重构和优化为更全面的功能(BC)
+- 向 ImageHandlerInterface 添加 convert()
+- 为下载禁用调试工具栏
+- CLI 命令现在返回错误码("spark"已更改)
+- 添加了 RESTful 控制器,以缩短 RESTful API 的开发时间
+- 作为 RESTful 支持的一部分,添加了 RouteCollection::presenter()
+
+应用变更
+-----------
+
+- 添加了 app/Common 以更轻松地重写常用函数
+- 添加了 Config/Email 和 Encryption
+- 修改了 Config/Migration,并具有不同的设置
+- 修复了 Controllers/Home,删除了不必要的模型引用
+
+消息变更
+---------------
+
+- 迁移具有新的和修改后的消息
+- 消息现在具有 RESTful 集
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+    - release-appstarter #2155
+    - release-framework #2155
+
+- app/
+    - Config/
+        - Email #2092
+        - Encryption #2135
+        - Migrations #2065
+    - Controllers/
+        - BaseController #2046
+        - Home #2145
+
+    - Common #2110
+
+- public/
+
+- system/
+    - API/
+        - ResponseTrait #2131
+    - Autoloader/
+        - Autoloader #2149
+        - FileLocator #2149
+    - Cache/Handlders/
+        - RedisHandler #2144
+    - CLI/
+        - CommandRunner #2164
+    - Commands/Database/
+        - CreateMigration #2065
+        - Migrate #2065, 2137
+        - MigrateRefresh #2065, 2137
+        - MigrateRollback #2065, 2137
+        - MigrateStatus #2137
+        - MigrateVersion #2137
+    - Config/
+        - BaseConfig #2082
+        - Services #2135, 2092
+    - Database/
+        - BaseBuilder #2127, 2090, 2142, 2153, 2160, 2023, 2001
+        - MigrationRunner #2065, 2137
+    - Debug/
+        - Toolbar #2118
+    - Email/
+        - Email #2092
+    - Encryption/
+        - EncrypterInterface #2135
+        - Encryption #2135
+        - Exceptions/EncryptionException #2135
+        - Handlers/
+            - BaseHandler #2135
+            - OpenSSLHandler #2135
+    - Exceptions/
+        - ConfigException #2065
+    - Files/
+        - File #2178
+    - Filters/
+        - DebugToolbar #2118
+    - Helpers/
+        - inflector_helper #2065
+    - Honeypot/
+        - Honeypot #2177
+    - HTTP/
+        - DownloadResponse #2129
+        - Files/UploadedFile #2128
+        - Message @2171
+        - Response #2166
+    - Images/
+        - Handlers/
+            -BaseHandler #2113, 2150
+            - ImageMagickHandler #2151
+        - BImageHandlerInterface #2113
+    - Language/en/
+        - Email #2092
+        - Encryption #2135
+        - Migrations #2065, 2137
+        - RESTful #2165
+    - RESTful/
+        - ResourceController #2165
+        - ResourcePresenter #2165
+    - Router/
+        - RouteCollection #2165
+    - Security/
+        - Security #2027
+    - Session/Handlers/
+        - RedisHandler #2125
+    - Test/
+        - CIDatabaseTestCase #2137
+
+    - bootstrap #2110
+    - CodeIgniter #2126, 2164
+    - Common #2109
+    - Entity #2112
+    - Model #2090
+
+- tests/_support/
+    - RESTful/... #2165
+
+- tests/system/
+    - API/
+        - ResponseTraitTest #2131
+    - Database/
+        - Builder/
+            - GetTest #2142
+            - SelectTest #2160
+            - WhereTest #2001
+        - Live/
+            - GroupTest #2160
+            - ModelTest #2090
+            - SelectTest #2160
+        - Migrations/MigrationRunnerTest #2065, 2137
+    - Encryption/
+        - EncryptionTest #2135
+        - OpenSSLHandlerTest #2135
+    - Helpers/
+        - InflectorHelperTest #2065
+    - HTTP/
+        - DownloadResponseTest #2129
+        - MessageTest #2171
+    - Images/
+        - GDHandlerTest #2113
+    - RESTful/
+        - ResourceControllerTest #2165
+        - ResourcePresenterTest #2165
+    - Router/
+        - RouteCollectionTest #2165
+
+    - ControllerTest #2165
+    - EntityTest #2112
+
+- user_guide_src/
+    - changelogs/
+        - next #2154
+    - database/
+        - query_builder #2160, 2001
+    - dbmgmt/
+        - migrations #2065, 2132, 2136, 2154, 2137
+    - extending/
+        - common #2162
+    - helpers/
+        - inflector_helper #2065
+    - incoming/
+        - restful #2165
+        - routing #2165
+    - libraries/
+        - email #2092, 2154
+        - encryption #2135
+        - images #2113, 2169
+    - outgoing/
+        - api_responses #2131
+        - localization #2134
+        - response #2129
+    - testing/
+        - database #2137
+
+- CONTRIBUTING.md #2010
+- README.md #2010
+- spark
+
+合并的 PR
+----------
+
+- #2178 添加缺失 finfo_open 的回退方法
+- #2177 修复缺失的表单关闭标签
+- #2171 Setheader 重复
+- #2169 为图像库添加 $quality 用法
+- #2166 Cookie 错误
+- #2165 RESTful 帮助
+- #2164 CLI 命令失败时退出错误码
+- #2162 用户指南针对 Common.php 的更新
+- #2160 为 BaseBuilder 添加 SelectCount
+- #2155 在启动器中包含 .gitignore
+- #2153 使用 LIMIT 时修复 countAllResults 的错误
+- #2154 修复电子邮件和迁移文档;更新变更日志
+- #2151 ImageMagick->save() 的返回值
+- #2150 针对 Image->fit() 的新逻辑
+- #2149 listNamespaceFiles:确保尾随斜杠
+- #2145 从 Home 控制器中删除 UserModel 引用
+- #2144 更新 Redis 遗留函数
+- #2142 修复获取 SQL 时 BaseBuilder 重置
+- #2137 新的迁移逻辑
+- #2136 迁移用户指南修复
+- #2135 加密
+- #2134 修复本地化说明
+- #2132 更新迁移用户指南
+- #2131 向 API\ResponseTrait 添加 No Content 响应
+- #2129 向 DownloadResponse 添加 setFileName()
+- #2128 回退到 clientExtension 进行扩展名猜测
+- #2127 更新 limit 函数,因为 $offset 是可以为空的
+- #2126 将 storePreviousURL 限制到某些请求
+- #2125 更新 redis 会话处理程序以支持 redis 5.0.x
+- #2118 在下载上禁用工具栏
+- #2113 添加 Image->convert()
+- #2112 更新 `Entity.php` 中的 `__isset` 方法
+- #2110 添加了 app/Common.php
+- #2109 修复检查 db_connect() 是否存在的拼写错误
+- #2092 原始电子邮件移植
+- #2090 修复在未设置条件的情况下防止软删除所有
+- #2082 更新 BaseConfig.php
+- #2065 更新的迁移逻辑以获得更全面的功能
+- #2046 清理基本控制器代码
+- #2027 修复 CSRF 散列重新生成
+- #2023 $value 不必为数组
+- #2010 修复 CSRF 哈希再生器词改动
+- #2001 BaseBuilder 中的子查询

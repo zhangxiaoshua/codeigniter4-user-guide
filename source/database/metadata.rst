@@ -1,137 +1,138 @@
-#################
-Database Metadata
-#################
+################
+获取元数据
+################
+
+.. contents::
+    :local:
+    :depth: 2
 
 **************
-Table MetaData
+表元数据
 **************
 
-These functions let you fetch table information.
+这些方法让你可以获取表信息。
 
-List the Tables in Your Database
+列出数据库中的所有表
 ================================
 
-**$db->listTables();**
+$db->listTables()
+-----------------
 
-Returns an array containing the names of all the tables in the database
-you are currently connected to. Example::
+返回一个数组，其中包含当前连接的数据库中所有表的名称。示例：
 
-	$tables = $db->listTables();
+.. literalinclude:: metadata/001.php
 
-	foreach ($tables as $table)
-	{
-		echo $table;
-	}
+.. note:: 某些驱动程序包含额外的系统表，这些表不会包含在此返回结果中。
 
-
-Determine If a Table Exists
+确定表是否存在
 ===========================
 
-**$db->tableExists();**
+$db->tableExists()
+------------------
 
-Sometimes it's helpful to know whether a particular table exists before
-running an operation on it. Returns a boolean TRUE/FALSE. Usage example::
+在对某个特定表执行操作之前，知道该表是否存在会很有帮助。此方法返回布尔值 true/false。用法示例：
 
-	if ($db->tableExists('table_name'))
-	{
-		// some code...
-	}
+.. literalinclude:: metadata/002.php
 
-.. note:: Replace *table_name* with the name of the table you are looking for.
-
+.. note:: 将 *table_name* 替换为你正在查找的表名。
 
 **************
-Field MetaData
+字段元数据
 **************
 
-List the Fields in a Table
+列出表中的所有字段
 ==========================
 
-**$db->getFieldNames()**
+$db->getFieldNames()
+--------------------
 
-Returns an array containing the field names. This query can be called
-two ways:
+返回一个包含字段名称的数组。此查询可以通过两种方式调用：
 
-1. You can supply the table name and call it from the $db->
-object::
+1. 你可以提供表名，并从 ``$db`` 对象调用：
 
-	$fields = $db->getFieldNames('table_name');
+    .. literalinclude:: metadata/003.php
 
-	foreach ($fields as $field)
-	{
-		echo $field;
-	}
+2. 你可以通过从查询结果对象调用该方法，来获取你运行的任何查询所关联的字段名称：
 
-2. You can gather the field names associated with any query you run by
-calling the function from your query result object::
+    .. literalinclude:: metadata/004.php
 
-	$query = $db->query('SELECT * FROM some_table');
-
-	foreach ($query->getFieldNames() as $field)
-	{
-		echo $field;
-	}
-
-
-Determine If a Field is Present in a Table
+确定字段是否存在于表中
 ==========================================
 
-**$db->fieldExists()**
+$db->fieldExists()
+------------------
 
-Sometimes it's helpful to know whether a particular field exists before
-performing an action. Returns a boolean TRUE/FALSE. Usage example::
+在执行某个操作之前，知道特定字段是否存在会很有帮助。此方法返回布尔值 true/false。用法示例：
 
-	if ($db->fieldExists('field_name', 'table_name'))
-	{
-		// some code...
-	}
+.. literalinclude:: metadata/005.php
 
-.. note:: Replace *field_name* with the name of the column you are looking
-	for, and replace *table_name* with the name of the table you are
-	looking for.
+.. note:: 将 *field_name* 和 *table_name* 分别替换为你正在查找的列名和表名。
 
-
-Retrieve Field Metadata
+获取字段元数据
 =======================
 
-**$db->getFieldData()**
+.. _db-metadata-getfielddata:
 
-Returns an array of objects containing field information.
+$db->getFieldData()
+-------------------
 
-Sometimes it's helpful to gather the field names or other metadata, like
-the column type, max length, etc.
+返回一个包含字段信息的对象数组。
 
-.. note:: Not all databases provide meta-data.
+有时收集字段名称或其他元数据（如列类型、最大长度等）会很有帮助。
 
-Usage example::
+.. note:: 并非所有数据库都提供元数据。
 
-	$fields = $db->getFieldData('table_name');
+用法示例：
 
-	foreach ($fields as $field)
-	{
-		echo $field->name;
-		echo $field->type;
-		echo $field->max_length;
-		echo $field->primary_key;
-	}
+.. literalinclude:: metadata/006.php
 
-If you have run a query already you can use the result object instead of
-supplying the table name::
+如果数据库支持，此函数可返回以下数据：
 
-	$query = $db->query("YOUR QUERY");
-	$fields = $query->fieldData();
+- ``name`` - 字段名
+- ``type`` - 字段的类型
+- ``max_length`` - 字段的最大长度
+- ``nullable`` - 如果字段可为空则为布尔值 ``true``，否则为布尔值 ``false``
+- ``default`` - 默认值
+- ``primary_key`` - 如果字段是主键则为整数 ``1`` （即使存在多个主键，也全为整数 ``1``），否则为整数 ``0`` （此字段当前仅在 ``MySQLi`` 和 ``SQLite3`` 中可用）
 
-The following data is available from this function if supported by your
-database:
+.. note:: 自 v4.4.0 版本起，SQLSRV 支持 ``nullable``。
 
--  name - column name
--  max_length - maximum length of the column
--  primary_key - 1 if the column is a primary key
--  type - the type of the column
+$query->getFieldData()
+----------------------
 
-List the Indexes in a Table
+如果已经执行过查询，可以使用结果对象代替提供表名：
+
+.. literalinclude:: metadata/007.php
+
+.. note:: 返回的数据与 ``$db->getFieldData()`` 返回的数据不同。如果无法获取所需数据，请使用 ``$db->getFieldData()``。
+
+列出表中的所有索引
 ===========================
 
-**$db->getIndexData()**
+.. _db-metadata-getindexdata:
 
-please write this, someone...
+$db->getIndexData()
+-------------------
+
+返回一个包含索引信息的对象数组。
+
+用法示例：
+
+.. literalinclude:: metadata/008.php
+
+键的类型可能因你使用的数据库而异。例如，MySQL 会为表关联的每个键返回 primary、fulltext、spatial、index 或 unique 中的一种。
+
+SQLite3 会返回一个名为 ``PRIMARY`` 的伪索引。但它是一个特殊索引，不能在 SQL 命令中使用。
+
+.. _metadata-getforeignkeydata:
+
+$db->getForeignKeyData()
+------------------------
+
+返回一个包含外键信息的对象数组。
+
+用法示例：
+
+.. literalinclude:: metadata/009.php
+
+外键使用 ``tableprefix_table_column1_column2_foreign`` 命名约定。Oracle 使用略有不同的后缀 ``_fk``。

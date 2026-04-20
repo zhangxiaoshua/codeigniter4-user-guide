@@ -1,0 +1,195 @@
+版本 4.0.0-beta.3
+====================
+
+发布日期：2019 年 5 月 7 日
+
+.. contents::
+    :local:
+    :depth: 2
+
+亮点
+----------
+
+- 在整个项目中添加了类型提示并纠正了拼写错误(参见 API 文档)
+- 修复了许多 model、database、validation 和 debug toolbar 问题
+
+新消息
+------------
+
+- Database.FieldNotExists
+- Validation.equals、not_equals
+
+应用变更
+-----------
+
+- 在 app/Config/App 中删除了 $salt 配置项
+- 在 app/Config/Migrations 中默认启用了迁移
+- 简化了 public/.htaccess
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+    - framework/composer.json #1935
+    - starter/composer.json #1935
+
+- app/
+    - Config/
+        - App #1973
+        - Migrations #1973
+
+- public/
+    - .htaccess #1973
+
+- system/
+    - API/
+        - ResponseTrait #1962
+    - Commands/
+        - Server/rewrite #1925
+    - Config/
+        - AutoloadConfig #1974
+        - BaseConfig #1947
+    - Database/ #1938
+        - BaseBuilder #1923, #1933, #1950
+        - BaseConnection #1950
+        - BaseResult #1917
+        - BaseUtils #1917
+        - Forge #1917
+        - SQLite3/
+            - Connection #1917
+            - Result #1917
+    - Debug/
+        - Toolbar #1916
+        - Toolbar/Collectors/
+            - BaseCollector #1972
+            - Config #1973
+            - History #1945
+            - Routes #1949
+        - Toolbar/Views/
+            - _config.tpl.php #1973
+            - toolbar.tpl.php #1972
+            - toolbarloader.js #1931, #1961
+    - Exceptions/
+        - EntityException #1927
+    - Filters/
+        Filters #1970, #1985
+    - Format/
+        - FormatterInterface #1918
+        - JSONFormatter #1918
+        - XMLFormatter #1918
+    - HTTP/
+        - CLIRequest #1956
+        - CURLRequest #1915
+    - Images/Handlers/
+        - BaseHandler #1956
+    - Language/en/
+        - Database #1917
+        - Validation #1952
+    - Router/
+        - Router #1968
+        - RouteCollection #1977
+    - Session/Handlers/
+        - RedisHandler #1980
+    - Test/
+        - FeatureResponse #1977
+        - FeatureTestCase #1977
+    - Validation/
+        - FormatRules #1957
+        - Rules #1952
+    - View/
+        - Table #1984
+    - Entity #1911, #1927, #1943, #1950, #1955
+    - Model #1930, #1943, #1963, #1981
+
+- tests/system/
+    - Config/
+        - BaseConfigTest #1947
+    - Database/
+        - BaseQueryTest #1917
+        - Live/
+            - DbUtilsTest #1917, #1943
+            - ForgeTest #1917
+            - GetTest #1917, #1943
+            - ModelTest #1930, #1943, #1981
+        - Migrations/
+            - MigrationRunnerTest #1917
+            - MigrationTest #1943
+    - Filters/
+        - FilterTest #1985
+    - Test/
+        - FeatureTestCaseTest #1977
+    - Validation/
+        - FormatRulesTest #1957
+        - RulesTest #1952, #cbe4b1d
+    - View/
+        - TableTest #1978, #1984
+    - EntityTest #1911
+
+- user_guide_src/
+    - dbmgmt/
+        - migrations #1973
+    - installation/
+        - installing_composer #1926
+        - running #1935
+    - libraries/
+        - validation #1952, #1954, #1957
+    - outgoing/
+        - index #1978
+        - table #1978, #1984
+    - testing/
+        - feature #1977
+        - overview #1936
+
+- .htaccess #1939
+- composer.json #1935
+- phpdoc.dist.xml #1987
+
+合并的 PR
+----------
+
+- #1987 纠正 API 文档块中的问题以生成 phpdocs
+- #1986 将文档块版本更新为 4.0.0
+- #1985 修复过滤器处理。修复 #1907
+- #cbe4b1d 修复 SQLite 测试
+- #1984 为 HTML 表添加页脚
+- #1981 使用软删除不应在连接表时返回模糊字段消息
+- #1980 修正了 Session/RedisHandler::read 的返回值
+- #1978 为 CI4 实现 HTML Table(遗失的功能)
+- #1977 Test/featuretestcase
+- #1974 从自动加载器的 classmap 中删除框架类
+- #1973 默认值修复
+- #1972 针对自定义收集器的工具栏修复
+- #1970 再次添加过滤器参数
+- #1968 修复 pathinfo 模式下的 404 错误
+- #1963 在数据库更新时,字符串类型的主键也应包装成数组
+- #1962 修复边缘问题
+- #1961 修复 Debugbar url 尾部斜杠问题
+- #1957 新的通用字符串验证规则
+- #1956 使用空合并运算符
+- #1955 修复 Travis-CI 构建失败
+- #1954 修复验证表格式
+- #1952 添加 `equals()` 和 `not_equals()` 的验证
+- #1951 系统拼写更改和代码清理
+- #1950 修复一些边缘问题
+- #1949 Toobar/Routes 更正
+- #1947 修复 BaseConfig 没有正确加载 Registrar 文件
+- #1945 从 debugbar 文件中提取日期时间
+- #1943 Model、Entity、Exception 和 Migration 测试用例
+- #1939 移除阻止盗链的部分
+- #1938 数据库拼写更改
+- #1936 文档:改进应用测试说明
+- #1935 更新 phpunit.xml 脚本。修复 #1932
+- #1933 having (删除 Is NULL)
+- #1931 Toolbar IE11 修复
+- #1930 根据 #1773 对 Model 进行更改
+- #1927 针对不存在属性抛出 Entity 异常
+- #1926 文档:更新安装指南
+- #1925 删除了 $_SERVER['CI_ENVIRONMENT']
+- #1923 缺失返回
+- #1918 JSONFormatter
+- #1917 数据库测试用例
+- #1916 检查值是否为字符串
+- #1915 修复 POST + JSON(添加 Content-Length)
+- #1911 JSON 强制转换异常测试用例

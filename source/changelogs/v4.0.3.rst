@@ -1,0 +1,34 @@
+版本 4.0.3
+=============
+
+发布日期：2020 年 5 月 1 日
+
+**CodeIgniter4 的 4.0.3 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+感谢社区的贡献,总共关闭了 74 个 bug,关闭了 21 个 issue,合并了 88 个 pull 请求。详细信息请参阅 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_。这里简要介绍一些较大的变动。
+
+增强功能
+------------
+
+- API 响应特性现在只在控制器的 ``$format`` 变量为 ``null`` 时才通过内容协商来确定最终格式(json/xml)。如果它包含 ``json`` 或 ``xml``,那么将总是返回那种格式。
+- 分页现在可以真正创建下一页和上一页的链接,而不仅仅是下一组/上一组的链接。
+- 想在本地构建用户指南副本的 Windows 用户现在可以使用包含的 ``make.bat`` 文件。
+- IncomingRequest 类中的 Locale 匹配现在可以匹配更宽泛的组,例如即使浏览器只提供更具体的 locale 代码(如 ``fr-FR``),也可以匹配到 ``fr``。
+- 添加了嵌套语言定义的功能。
+- 在 form_open('action') 中可以将 {locale} 替换为 request->getLocale()。
+- CLI 命令生成的表格现在可以着色。
+
+Bug 修复
+----------
+
+- 在具有字符串主键的表上通过 Model 删除现在可以工作。
+- 默认分页模板修复为使用正确的 locale。
+- 用户指南中进行了大量调整和更正。
+- 修复了自定义命名空间中偶尔找不到文件的问题。主要影响控制台命令。
+
+有关完整的已修复 Bug 列表，请参阅代码库的
+`CHANGELOG_4.0.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.0.md>`_。

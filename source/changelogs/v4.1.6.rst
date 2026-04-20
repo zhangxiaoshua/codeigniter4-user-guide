@@ -1,0 +1,73 @@
+版本 4.1.6
+#############
+
+发布日期：2022 年 1 月 3 日
+
+**CodeIgniter4 的 4.1.6 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+安全性
+********
+
+- 修复了 ``old()`` 函数中存在的“不受信任数据的反序列化”问题。更多信息请参阅 `安全公告 <https://github.com/codeigniter4/CodeIgniter4/security/advisories/GHSA-w6jr-wj64-mc9x>`_。
+
+不兼容变更
+**********
+
+- ``BaseBuilder::$tableName`` 中不再存储多个表名 - 会改用空字符串。
+
+.. _changelog-v416-validation-changes:
+
+验证变更
+==================
+
+- 验证的前一个版本无法处理数组项。
+  由于此bug修复,验证结果可能不同,
+  或引发 ``TypeError``。
+  但前一个版本的结果可能是不正确的。
+- 验证将多个字段的验证过程分开,
+  如 ``contacts.*.name`` 和单个字段。
+  当单个字段具有数组数据时,前一个版本会验证数组的每个元素。
+  验证规则将数组的一个元素作为参数。
+  另一方面,当前版本将数组作为一个整体传递给验证规则。
+
+增强功能
+************
+
+- 全面支持 PHP 8.1。
+- 调试工具栏上的数据库面板现在会显示查询调用的位置。还显示完整的回溯。
+- QueryBuilder 中的 :ref:`子查询 <query-builder-where-subquery>` 现在可以是 BaseBuilder 类的实例。
+- 将 Kint 从 ^3.3 升级到 ^4.0。
+
+变更
+*******
+
+- 发送 cookie 的过程已移动到 ``Response`` 类中。现在 ``Security`` 和 ``CookieStore`` 类不再发送 cookie,而是将它们设置到 Response 中。
+
+弃用功能
+************
+
+- 弃用 ``Seeder::faker()`` 和 ``Seeder::$faker``。
+- 弃用 ``BaseBuilder::cleanClone()``。
+
+发送 Cookie
+===============
+
+发送 cookie 的过程已移至 ``Response`` 类中。
+
+以下方法已被弃用:
+
+- ``CookieStore::dispatch()``
+- ``CookieStore::setRawCookie()``
+- ``CookieStore::setCookie()``
+- ``Security::sendCookie()``
+- ``Security::doSendCookie()``
+
+Bug 修复
+**********
+
+有关完整的 Bug 修复列表，请参阅仓库的
+`CHANGELOG_4.1.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.1.md>`_。

@@ -1,0 +1,82 @@
+name: Build Docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+        fetch-depth: 10
+
+    - name: Install Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install OS dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y texlive-xetex texlive-lang-chinese texlive-fonts-recommended texlive-fonts-extra fonts-freefont-otf latexmk xindy
+        pip install --upgrade pip
+
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache dependencies
+      uses: actions/cache@v5
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Build docs
+      run: |
+        make html
+        make latexpdf
+
+    - name: Checkout gh-pages
+      uses: actions/checkout@v6
+      with:
+        repository: ${{ github.repository }}
+        ref: gh-pages
+        path: 'gh-pages'
+        clean: false
+
+    - name: Update gh-pages
+      run: |
+        cd ./build/html
+        rm .buildinfo
+        zip -r ./codeigniter_user_guide.zip ./
+        cd ../latex
+        cp CodeIgniter.pdf ../../gh-pages/
+        cd ../../gh-pages
+        cp -Rf ../build/html/* .
+
+    - name: Commit changes
+      run: |
+        cd gh-pages
+        git config user.name "GitHub Actions Bot"
+        git config user.email "support@codeigniter.org.cn"
+        git add -f .
+        git commit -m "Deploy to GitHub Pages"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: gh-pages
+        directory: 'gh-pages'

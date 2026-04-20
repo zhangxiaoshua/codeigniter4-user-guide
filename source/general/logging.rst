@@ -1,160 +1,104 @@
 ###################
-Logging Information
+日志信息记录
 ###################
 
-You can log information to the local log files by using the ``log_message()`` method. You must supply
-the "level" of the error in the first parameter, indicating what type of message it is (debug, error, etc).
-The second parameter is the message itself::
+.. contents::
+    :local:
+    :depth: 2
 
-	if ($some_var == '')
-	{
-		log_message('error', 'Some variable did not contain a value.');
-	}
+日志级别
+==========
 
-There are eight different log levels, matching to the `RFC 5424 <http://tools.ietf.org/html/rfc5424>`_ levels, and they are as follows:
+可以使用 :php:func:`log_message()` 方法将信息记录到本地日志文件中。必须在第一个参数中提供错误的"级别"，以表明这是哪种类型的消息（debug、error 等）。第二个参数是消息本身：
 
-* debug - Detailed debug information.
-* info - Interesting events in your application, like a user logging in, logging SQL queries, etc. 
-* notice - Normal, but significant events in your application.
-* warning - Exceptional occurrences that are not errors, like the user of deprecated APIs, poor use of an API, or other undesirable things that are not necessarily wrong.
-* error - Runtime errors that do not require immediate action but should typically be logged and monitored.
-* critical - Critical conditions, like an application component not available, or an unexpected exception.
-* alert - Action must be taken immediately, like when an entire website is down, the database unavailable, etc. 
-* emergency - The system is unusable.
+.. literalinclude:: logging/001.php
 
-The logging system does not provide ways to alert sysadmins or webmasters about these events, they solely log
-the information. For many of the more critical event levels, the logging happens automatically by the
-Error Handler, described above.
+共有八个不同的日志级别，与 `RFC 5424 <https://tools.ietf.org/html/rfc5424>`_ 标准级别相匹配，具体如下：
 
-Configuration
+=========== ==================================================================
+级别        描述
+=========== ==================================================================
+debug       详细的调试信息。
+info        应用程序中的重要事件，如用户登录、记录 SQL 查询等。
+notice      应用程序中的正常但重要的事件。
+warning     异常情况但不是错误，如使用已废弃的 API、不当的 API 使用，
+            或其他不一定是错误的不良情况。
+error       不需要立即采取行动但通常应该记录和监控的运行时错误。
+critical    严重状况，如应用程序组件不可用，或出现意外异常。
+alert       必须立即采取行动，如整个网站宕机、数据库不可用等。
+emergency   系统无法使用。
+=========== ==================================================================
+
+日志系统不提供向系统管理员或网站管理员发出这些事件警报的方式，它们仅负责记录信息。对于许多更严重的事件级别，日志记录由上述错误处理程序自动进行。
+
+.. _logging-configuration:
+
+配置
 =============
 
-You can modify which levels are actually logged, as well as assign different Loggers to handle different levels, within
-the ``/application/Config/Logger.php`` configuration file.
+可以在 **app/Config/Logger.php** 配置文件中修改实际记录的级别，以及为不同的级别分配不同的日志处理器。
 
-The ``threshold`` value of the config file determines which levels are logged across your application. If any levels
-are requested to be logged by the application, but the threshold doesn't allow them to log currently, they will be
-ignored. The simplest method to use is to set this value to the minimum level that you want to have logged. For example,
-if you want to log debug messages, and not information messages, you would set the threshold to ``5``. Any log requests with
-a level of 5 or less (which includes runtime errors, system errors, etc) would be logged and info, notices, and warnings
-would be ignored::
+配置文件中的 ``threshold`` 值决定了整个应用程序中记录哪些级别的日志。如果应用程序请求记录某些级别，但当前阈值不允许它们记录，这些请求将被忽略。最简单的使用方法是将此值设置为想要记录的最低级别。例如，如果想要记录警告消息而不是信息消息，可以将阈值设置为 ``5``。级别为 5 或更低的任何日志请求（包括运行时错误、系统错误等）都将被记录，而 info、notice 和 debug 级别将被忽略：
 
-	public $threshold = 5;
+.. literalinclude:: logging/002.php
 
-A complete list of levels and their corresponding threshold value is in the configuration file for your reference.
+配置文件中提供了完整的级别列表及其对应的阈值供参考。
 
-You can pick and choose the specific levels that you would like logged by assigning an array of log level numbers
-to the threshold value::
+可以通过将日志级别编号的数组赋值给阈值来选择想要记录的特定级别：
 
-	// Log only debug and info type messages
-	public $threshold = [5, 8];
+.. literalinclude:: logging/003.php
 
-Using Multiple Log Handlers
+使用多个日志处理器
 ---------------------------
 
-The logging system can support multiple methods of handling logging running at the same time. Each handler can
-be set to handle specific levels and ignore the rest. Currently, two handlers come with a default install:
+日志系统可以同时支持多种日志处理方式。每个处理器可以设置为处理特定级别并忽略其余级别。目前，默认安装包含三个处理器：
 
-- **File Handler** is the default handler and will create a single file for every day locally. This is the 
-  recommended method of logging.
-- **ChromeLogger Handler** If you have the `ChromeLogger extension <https://craig.is/writing/chrome-logger>`_
-  installed in the Chrome web browser, you can use this handler to display the log information in
-  Chrome's console window.
+- **文件处理器** 是默认处理器，将在本地为每一天创建单个文件。这是推荐的日志记录方法。
+- **ChromeLogger 处理器** 如果在 Chrome 网页浏览器中安装了 `ChromeLogger 扩展 <https://craig.is/writing/chrome-logger>`_，
+  可以使用此处理器在 Chrome 的控制台窗口中显示日志信息。
+- **Errorlog 处理器** 此处理器将利用 PHP 原生的 ``error_log()`` 函数并在其中写入日志。
+  目前，仅支持 ``error_log()`` 的 ``0`` 和 ``4`` 消息类型。
 
-The handlers are configured in the main configuration file, in the ``$handlers`` property, which is simply
-an array of handlers and their configuration. Each handler is specified with the key being the fully
-name-spaced class name. The value will be an array of varying properties, specific to each handler.
-Each handler's section will have one property in common: ``handles``, which is an array of log level
-__names__ that the handler will log information for.
-::
+处理器在主配置文件的 ``$handlers`` 属性中配置，这只是一个处理器及其配置的数组。每个处理器通过完全限定的命名空间类名作为键来指定。值将是一个各不相同的属性数组，特定于每个处理器。每个处理器的部分都有一个共同的属性：``handles``，这是一个日志级别 *名称* 的数组，处理器将为这些级别记录日志信息。
 
-	public $handlers = [
+.. literalinclude:: logging/004.php
 
-		//--------------------------------------------------------------------
-		// File Handler
-		//--------------------------------------------------------------------
-
-		'CodeIgniter\Log\Handlers\FileHandler' => [
-
-			'handles' => ['critical', 'alert', 'emergency', 'debug', 'error', 'info', 'notice', 'warning'],
-		]
-	];
-
-
-
-Modifying the Message With Context
+使用上下文修改消息
 ==================================
 
-You will often want to modify the details of your message based on the context of the event being logged.
-You might need to log a user id, an IP address, the current POST variables, etc. You can do this by use
-placeholders in your message. Each placeholder must be wrapped in curly braces. In the third parameter,
-you must provide an array of placeholder names (without the braces) and their values. These will be inserted
-into the message string::
+通常需要根据被记录事件的上下文来修改消息的详细信息。可能需要记录用户 ID、IP 地址、当前的 POST 变量等。可以通过在消息中使用占位符来实现这一点。每个占位符必须用大括号包裹。在第三个参数中，必须提供一个包含占位符名称（不带大括号）及其值的数组。这些将被插入到消息字符串中：
 
-	// Generates a message like: User 123 logged into the system from 127.0.0.1
-	$info = [
-		'id' => $user->id,
-		'ip_address' => $this->request->ip_address()
-	];
+.. literalinclude:: logging/005.php
 
-	log_message('info', 'User {id} logged into the system from {ip_address}', $info);
+如果想要记录异常或错误，可以使用 'exception' 键，值是异常或错误本身。将从此对象生成一个包含错误消息、文件名和行号的字符串。仍然必须在消息中提供异常占位符：
 
-If you want to log an Exception or an Error, you can use the key of 'exception', and the value being the
-Exception or Error itself. A string will be generated from that object containing the error message, the
-file name and line number.  You must still provide the exception placeholder in the message::
+.. literalinclude:: logging/006.php
 
-	try 
-	{
-		... Something throws error here
-	}
-	catch (\Exception #e)
-	{
-		log_message('error', '[ERROR] {exception}', ['exception' => $e]);
-	}
-
-Several core placeholders exist that will be automatically expanded for you based on the current page request:
+存在几个核心占位符，它们将根据当前页面请求自动展开：
 
 +----------------+---------------------------------------------------+
-| Placeholder    | Inserted value                                    |
+| 占位符         | 插入值                                            |
 +================+===================================================+
-| {post_vars}    | $_POST variables                                  |
+| {post_vars}    | $_POST 变量                                       |
 +----------------+---------------------------------------------------+
-| {get_vars}     | $_GET variables                                   |
+| {get_vars}     | $_GET 变量                                        |
 +----------------+---------------------------------------------------+
-| {session_vars} | $_SESSION variables                               |
+| {session_vars} | $_SESSION 变量                                    |
 +----------------+---------------------------------------------------+
-| {env}          | Current environment name, i.e. development        |
+| {env}          | 当前环境名称，即 development                      |
 +----------------+---------------------------------------------------+
-| {file}         | The name of file calling the logger               |
+| {file}         | 调用日志记录器的文件名                            |
 +----------------+---------------------------------------------------+
-| {line}         | The line in {file} where the logger was called    |
+| {line}         | 在 {file} 中调用日志记录器的行号                  |
 +----------------+---------------------------------------------------+
-| {env:foo}      | The value of 'foo' in $_ENV                       |
+| {env:foo}      | $_ENV 中的 'foo' 值                               |
 +----------------+---------------------------------------------------+
 
-
-Using Third-Party Loggers
+使用第三方日志记录器
 =========================
 
-You can use any other logger that you might like as long as it extends from either
-``Psr\Log\LoggerInterface`` and is `PSR3 <http://www.php-fig.org/psr/psr-3/>`_ compatible. This means
-that you can easily drop in use for any PSR3-compatible logger, or create your own.
+可以使用任何其他喜欢的日志记录器，只要它扩展自 ``Psr\Log\LoggerInterface`` 并且与 `PSR-3 <https://www.php-fig.org/psr/psr-3/>`_ 兼容。这意味着可以轻松使用任何 PSR-3 兼容的日志记录器，或者创建自己的日志记录器。
 
-You must ensure that the third-party logger can be found by the system, by adding it to either
-the ``/application/Config/Autoload.php`` configuration file, or through another autoloader,
-like Composer. Next, you should modify ``/application/Config/Services.php`` to point the ``logger``
-alias to your new class name.
+必须确保第三方日志记录器能够被系统找到，方法是将其添加到 **app/Config/Autoload.php** 配置文件中，或者通过其他自动加载器（如 Composer）。接下来，应该修改 **app/Config/Services.php** 将 ``logger`` 别名指向新的类名。
 
-Now, any call that is done through the ``log_message()`` function will use your library instead.
-
-LoggerAware Trait
-=================
-
-If you would like to implement your libraries in a framework-agnostic method, you can use
-the ``CodeIgniter\Log\LoggerAwareTrait`` which implements the ``setLogger()`` method for you.
-Then, when you use your library under different environments for frameworks, your library should
-still be able to log as it would expect, as long as it can find a PSR3 compatible logger.
-
-
-
-
+现在，通过 :php:func:`log_message()` 函数进行的任何调用都将使用你的库。

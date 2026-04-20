@@ -1,74 +1,62 @@
-##########
-Typography
-##########
+#############
+Typography 类
+#############
 
-The Typography libary contains methods that help your format text
-in semantically relevant ways.
+Typography 类包含多种辅助方法，用于将文本格式化为符合语义规范的形式。
+
+.. contents::
+    :local:
+    :depth: 2
 
 *******************
-Loading the Library
+加载类
 *******************
 
-Like all services in CodeIgniter, it can be loaded via ``Config\Services``, though you usually will not need
-to load it manually::
+与 CodeIgniter 的所有服务一样，Typography 类可通过 ``Config\Services`` 加载，不过通常无需手动操作：
 
-    $typography = \Config\Services::typography();
+.. literalinclude:: typography/001.php
 
 **************************
-Available static functions
+可用静态方法
 **************************
 
-The following functions are available:
+以下方法均可直接使用：
 
-**autoTypography()**
+.. php:function:: autoTypography($str[, $reduceLinebreaks = false])
 
-.. php:function:: autoTypography($str[, $reduce_linebreaks = FALSE])
+    :param    string    $str: 输入字符串
+    :param    bool    $reduceLinebreaks: 是否将连续出现的多个双换行符缩减为两个
+    :returns:    格式化后的 HTML 字符串
+    :rtype: string
 
-	:param	string	$str: Input string
-	:param	bool	$reduce_linebreaks: Whether to reduce multiple instances of double newlines to two
-	:returns:	HTML-formatted typography-safe string
-	:rtype: string
+    将文本格式化为语义准确且排版规范的 HTML。
 
-	Formats text so that it is semantically and typographically correct
-	HTML.
+    使用示例：
 
-	Usage example::
+    .. literalinclude:: typography/002.php
 
-		$string = $typography->autoTypography($string);
-
-	.. note:: Typographic formatting can be processor intensive, particularly if
-		you have a lot of content being formatted. If you choose to use this
-		function you may want to consider :doc:`caching <../general/caching>` your
-		pages.
-		
-**formatCharacters()**
+    .. note:: 排版格式化操作较为耗费性能，尤其在处理大量内容时。若决定使用此函数，建议考虑对页面进行 :doc:`缓存 <../general/caching>`。
 
 .. php:function:: formatCharacters($str)
 
-	:param	string	$str: Input string
-	:returns:	String with formatted characters.
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    格式化后的字符串
+    :rtype:    string
 
-	This function mainly converts double and single quotes
-	to curly entities, but it also converts em-dashes,
-	double spaces, and ampersands.
+    主要用于将双引号和单引号转换为弯引号（curly entities），同时也会转换破折号（em-dashes）、双空格以及和号（ampersands）。
 
-	Usage example::
+    使用示例：
 
-		$string = $typography->formatCharacters($string);
-		
-**nl2brExceptPre()**
+    .. literalinclude:: typography/003.php
 
 .. php:function:: nl2brExceptPre($str)
 
-	:param	string	$str: Input string
-	:returns:	String with HTML-formatted line breaks
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    包含 HTML 换行标签的字符串
+    :rtype:    string
 
-	Converts newlines to <br /> tags unless they appear within <pre> tags.
-	This function is identical to the native PHP ``nl2br()`` function,
-	except that it ignores <pre> tags.
+    将换行符转换为 ``<br />`` 标签，但会忽略 ``<pre>`` 标签内的换行。此函数逻辑与 PHP 原生函数 ``nl2br()`` 基本一致，唯一的区别是排除了 ``<pre>`` 标签。
 
-	Usage example::
+    使用示例：
 
-		$string = $typography->nl2brExceptPre($string);
+    .. literalinclude:: typography/004.php

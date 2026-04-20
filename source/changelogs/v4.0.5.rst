@@ -1,0 +1,60 @@
+版本 4.0.5
+==================
+
+发布日期：2021 年 1 月 31 日
+
+**CodeIgniter4 的 4.0.5 版本发布**
+
+.. contents::
+   :local:
+   :depth: 2
+
+增强功能
+------------
+
+- 新增 URL 辅助函数 :php:func:`url_to()`,可基于控制器创建绝对 URLs。
+- 新增 Model 选项:``$useAutoIncrement``,设置为 ``false`` 时,允许你为表中的每条记录提供自己的主键。这在实现 1:1 关系或在模型中使用 UUID 时很方便。
+- 新增 URL 辅助函数 :php:func:`url_is()`,可检查当前 URL 是否匹配给定字符串。
+- 服务类的参数类型现在进行了严格定义。这将确保不会传入其他配置实例。如果需要传递带有额外属性的新配置,则需要扩展特定的配置类。
+- 支持为 Session 和 CSRF cookie 设置 SameSite 属性。出于安全和与最新浏览器版本的兼容性考虑,默认设置为 ``Lax``。
+- 在 ``Config\Mimes::guessExtensionFromType()`` 中,现在只有在没有提议扩展名时(即通常不用于上传的文件),才会反向搜索 ``$mimes`` 数组。
+- 上传文件的文件扩展名的 getter 函数现在具有不同的回退值(``UploadedFile::getClientExtension()`` 用于 ``UploadedFile::getExtension()``, ``''`` 用于 ``UploadedFile::guessExtension()``)。这是一个安全修复,使该过程不太依赖客户端。
+- Cache ``FileHandler`` 现在允许通过 ``Config\Cache`` 设置文件权限模式。
+
+变更
+-------
+
+- 定义在 **system/Language/en/** 中的系统消息现在严格用于内部框架使用,不再涵盖向后兼容性(BC)保证。用户可以在应用中使用这些消息,但有自己的风险。
+
+弃用功能
+------------
+
+- 弃用 ``BaseCommand::getPad()`` ,改用 ``BaseCommand::setPad()``。
+- 弃用 ``CodeIgniter\Controller::loadHelpers()``,改用 ``helper()`` 函数。
+- 弃用 ``Config\Format::getFormatter()``,改用 ``CodeIgniter\Format\Format::getFormatter()``。
+- 弃用 ``CodeIgniter\Security\Security::CSRFVerify()``,改用 ``CodeIgniter\Security\Security::verify()``。
+- 弃用 ``CodeIgniter\Security\Security::getCSRFHash()``,改用 ``CodeIgniter\Security\Security::getHash()``。
+- 弃用 ``CodeIgniter\Security\Security::getCSRTokenName()``,改用 ``CodeIgniter\Security\Security::getTokenName()``。
+- 弃用 ``Config\App::$CSRFTokenName``,改用 ``Config\Security::$tokenName``。
+- 弃用 ``Config\App::$CSRFHeaderName``,改用 ``Config\Security::$headerName``。
+- 弃用 ``Config\App::$CSRFCookieName``,改用 ``Config\Security::$cookieName``。
+- 弃用 ``Config\App::$CSRFExpire``,改用 ``Config\Security::$expire``。
+- 弃用 ``Config\App::$CSRFRegenerate``,改用 ``Config\Security::$regenerate``。
+- 弃用 ``Config\App::$CSRFRedirect``,改用 ``Config\Security::$redirect``。
+- 弃用 ``Config\App::$CSRFSameSite``,改用 ``Config\Security::$samesite``。
+- 弃用 ``migrate:create`` 命令,改用 ``make:migration`` 命令。
+- 弃用 ``CodeIgniter\Database\ModelFactory``,改用 ``CodeIgniter\Config\Factories::models()``。
+- 弃用 ``CodeIgniter\Config\Config``,改用 ``CodeIgniter\Config\Factories::config()``。
+- 弃用 ``CodeIgniter\HTTP\Message::getHeader()``,改用 ``header()`` 以准备迁移到 PSR-7。
+- 弃用 ``CodeIgniter\HTTP\Message::getHeaders()``,改用 ``headers()`` 以准备迁移到 PSR-7。
+- 弃用 ``Config\Cache::$storePath``,改用 ``Config\Cache::$file['storePath']``。
+
+Bug 修复
+----------
+
+- 修复了 ``Entity`` 类中的一个错误,声明类参数阻止了数据传播到 ``attributes`` 数组。
+- 对环境变量 ``encryption.key`` 的处理发生了变化。以前,显式函数调用,如 ``getenv('encryption.key')`` 或 ``env('encryption.key')``,其中值具有特殊前缀 ``hex2bin:``,会自动转换为二进制字符串并返回。这现在已更改为只返回具有前缀的字符字符串。此更改是由于在 Windows 平台上处理环境变量中的二进制字符串不兼容导致的。但是,通过 ``Encryption`` 类配置访问 ``$key`` 保持不变,仍然返回二进制字符串。
+- ``Config\Services`` (在 **app/Config/Services.php** 中)现在扩展 ``CodeIgniter\Config\BaseService``,以允许正确发现第三方服务。
+
+有关已修复的 Bug 列表，请参见仓库的
+`CHANGELOG_4.0.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.0.md>`_。

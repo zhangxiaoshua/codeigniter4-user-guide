@@ -1,0 +1,58 @@
+版本 4.3.6
+#############
+
+发布日期：2023 年 6 月 18 日
+
+**CodeIgniter4 的 4.3.6 版本发布**
+
+.. contents::
+    :local:
+    :depth: 3
+
+不兼容变更
+**********
+
+接口变更
+=================
+
+.. note:: 只要你没有扩展相关的 CodeIgniter 核心类
+    或实现这些接口,所有这些变更都是向后兼容的,
+    不需要任何干预。
+
+AutoRouterInterface
+-------------------
+
+现在 ``AutoRouterInterface::getRoute()`` 有了新的第二个参数 ``string $httpVerb``。
+
+ValidationInterface::check()
+----------------------------
+
+- 第二个参数已从 ``string $rule`` 更改为 ``$rules``。
+- 添加了可选的第四个参数 ``$dbGroup = null``。
+
+方法签名变更
+========================
+
+Validation::check()
+-------------------
+
+- 第二个参数已从 ``string $rule`` 更改为 ``$rules``。
+- 添加了可选的第四个参数 ``$dbGroup = null``。
+
+弃用功能
+************
+
+- **AutoRouterImproved:** 构造函数参数 ``$httpVerb`` 已弃用。
+  不再使用。
+
+Bug 修复
+**********
+
+- **验证:** 修复了检查占位符值时会忽略 ``$DBGroup`` 的错误。
+- **验证:** 修复了 ``check()`` 无法指定非默认数据库组的错误。
+- **数据库:** 修复了 Postgre 连接参数中的分号字符 (``;``) 会中断 DSN 字符串的错误。
+- **AutoRouting Improved:** 修复了功能测试可能找不到控制器/方法的错误。
+
+请查看仓库的
+`CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_
+以获取完整的 Bug 修复列表。

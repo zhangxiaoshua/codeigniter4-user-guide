@@ -1,230 +1,363 @@
-***************************
-Working with Uploaded Files
-***************************
+###########################
+处理上传文件
+###########################
 
-CodeIgniter makes working with files uploaded through a form much simpler and more secure than using PHP's ``$_FILES``
-array directly. This extends the :doc:`File class </libraries/files>` and thus gains all of the features of that class.
+相比直接使用 PHP 的 ``$_FILES`` 数组，CodeIgniter 处理表单上传文件更加简单、安全。该类扩展了 :doc:`File 类 </libraries/files>`，因此具备 File 类的全部功能。
 
-.. note:: This is not the same as the File Uploading class in previous versions of CodeIgniter. This provides a raw
-	interface to the uploaded files with a few small features. An uploader class will be present in the final release.
+.. note:: 这与 CodeIgniter 3 中的文件上传类不同。此类提供对上传文件的原始接口，附带少量便捷功能。
 
-.. contents:: Page Contents
-  :local:
+.. contents::
+    :local:
+    :depth: 2
 
-===============
-Accessing Files
-===============
+.. _file-upload-form-tutorial:
 
-All Files
-----------
+*************************
+文件上传教程
+*************************
 
-When you upload files they can be accessed natively in PHP through the ``$_FILES`` superglobal. This array has some
-major shortcomings when working with multiple files uploaded at once, and has potential security flaws many developers
-are not aware of. CodeIgniter helps with both of these situations by standardizing your usage of files behind a
-common interface.
+上传文件的一般流程如下：
 
-Files are accessed through the current ``IncomingRequest`` instance. To retrieve all files that were uploaded with this
-request, use ``getFiles()``. This will return an array of files represented by instances of ``CodeIgniter\HTTP\Files\UploadedFile``::
+-  显示上传表单，用户选择文件并上传。
+-  表单提交后，文件上传到指定的目标位置。
+-  上传过程中，文件会根据设定的偏好进行验证，确保允许上传。
+-  上传成功后，向用户显示成功消息。
 
-	$files = $this->request->getFiles();
+以下是一个简短的教程来演示此过程，后面附有参考信息。
 
-Of course, there are multiple ways to name the file input, and anything but the simplest can create strange results.
-The array returns in a manner that you would expect. With the simplest usage, a single file might be submitted like::
+创建上传表单
+========================
 
-	<input type="file" name="avatar" />
+使用文本编辑器创建名为 **upload_form.php** 的表单，将以下代码放入其中并保存到 **app/Views** 目录：
 
-Which would return a simple array like::
+.. literalinclude:: uploaded_files/001.php
 
-	[
-		'avatar' => // UploadedFile instance
-	]
+此处使用了表单辅助函数来创建表单起始标签。文件上传需要 multipart 表单，辅助函数会生成正确的语法。
 
-If you used an array notation for the name, the input would look something like::
+同时可以看到 ``$errors`` 变量，用于在用户操作出错时显示错误消息。
 
-	<input type="file" name="my-form[details][avatar]" />
+成功页面
+================
 
-The array returned by ``getFiles()`` would look more like this::
+使用文本编辑器创建名为 **upload_success.php** 的表单，将以下代码放入其中并保存到 **app/Views** 目录::
 
-	[
-		'my-form' => [
-			'details' => [
-				'avatar' => // UploadedFile instance
-			]
-		]
-	]
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>Upload Form</title>
+    </head>
+    <body>
 
-In some cases, you may specify an array of files to upload::
+    <h3>Your file was successfully uploaded!</h3>
 
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
+    <ul>
+        <li>name: <?= esc($uploaded_fileinfo->getBasename()) ?></li>
+        <li>size: <?= esc($uploaded_fileinfo->getSizeByUnit('kb')) ?> KB</li>
+        <li>extension: <?= esc($uploaded_fileinfo->guessExtension()) ?></li>
+    </ul>
 
-In this case, the returned array of files would be more like::
+    <p><?= anchor('upload', 'Upload Another File!') ?></p>
 
-	[
-		'my-form' => [
-			'details' => [
-				'avatar' => [
-					0 => /* UploadedFile instance */,
-					1 => /* UploadedFile instance */
-			]
-		]
-	]
+    </body>
+    </html>
 
-Single File
------------
+控制器
+==============
 
-If you just need to access a single file, you can use ``getFile()`` to retrieve the file instance directly. This will return an instance of ``CodeIgniter\HTTP\Files\UploadedFile``:
+使用文本编辑器创建名为 **Upload.php** 的控制器，将以下代码放入其中并保存到 **app/Controllers** 目录：
 
-Simplest usage
-^^^^^^^^^^^^^^
+.. literalinclude:: uploaded_files/002.php
 
-With the simplest usage, a single file might be submitted like::
+只有 :ref:`rules-for-file-uploads` 可用于验证上传的文件。
 
-	<input type="file" name="userfile" />
+因此也无法使用 ``required`` 规则，如果文件是必需的，应改用 ``uploaded`` 规则。
 
-Which would return a simple file instance like::
+注意，传递给 ``$this->validateData()`` 的第一个参数是空数组（``[]``）。这是因为文件验证规则会直接从 Request 对象获取上传文件的数据。
 
-	$file = $this->request->getFile('userfile');
+如果表单中除文件上传外还有其他字段，将字段数据作为第一个参数传递即可。
 
-Array notation
-^^^^^^^^^^^^^^
+路由
+==========
 
-If you used an array notation for the name, the input would look something like::
+使用文本编辑器打开 **app/Config/Routes.php**，添加以下两条路由：
 
-	<input type="file" name="my-form[details][avatar]" />
+.. literalinclude:: uploaded_files/021.php
 
-For get the file instance::
+上传目录
+====================
 
-	$file = $this->request->getFile('my-form.details.avatar');
+上传的文件存储在 **writable/uploads/** 目录中。
 
+试一试！
+========
 
-Multiple files
-^^^^^^^^^^^^^^
+要尝试此表单，访问类似以下 URL 的地址::
 
-	<input type="file" name="images[]" multiple />
+    example.com/index.php/upload/
 
-In controller::
-	if($imagefile = $this->request->getFiles())
-	{  
-	   foreach($imagefile['images'] as $Im)
-	   {
-	      if ($im->isValid() && ! $im->hasMoved())
-	      {
-	           $newName = $img->getRandomName();
-	           $img->move(WRITEPATH.'uploads', $newName);
-	      }
-	   }
-	}
+应该会看到一个上传表单。尝试上传一个图片文件（**jpg**、**gif**、**png** 或 **webp** 均可）。如果控制器中的路径正确，应该就能成功上传。
 
-	where the **images** is loop is from the form field name
-	
-If there are multiple files with the same name you can use ``getFile()`` ro retrieve every file individually::
-In controller::
-	
-	$file1 = $this->request->getFile('images.0');
-	$file2 = $this->request->getFile('images.1');
+.. _uploaded-files-accessing-files:
 
-Another example::
+***************
+访问文件
+***************
 
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
-	Upload an avatar: <input type="file" name="my-form[details][avatars][]" />
+所有文件
+=========
 
-In controller::
+上传的文件可以通过 PHP 的 ``$_FILES`` 超全局变量直接访问。这个数组在处理多个文件同时上传时存在重大缺陷，并且存在许多开发者不了解的潜在安全漏洞。CodeIgniter 通过统一接口来标准化文件的使用，解决了这两个问题。
 
-	$file1 = $this->request->getFile('my-form.details.avatars.0');
-	$file2 = $this->request->getFile('my-form.details.avatars.1');
+通过当前的 ``IncomingRequest`` 实例访问文件。要检索此请求中上传的所有文件，使用 ``getFiles()``。将返回一个由 ``CodeIgniter\HTTP\Files\UploadedFile`` 实例表示的文件数组：
 
-.. note:: using ``getFiles()`` is more appropriate 
+.. literalinclude:: uploaded_files/003.php
 
-=====================
-Working With the File
-=====================
+当然，文件 input 标签的命名方式有多种，除最简单的情况外，其他都可能产生奇怪的结果。数组的返回方式和你期望的一样。对于最简单的用法，可能只提交一个文件::
 
-Once you've retrieved the UploadedFile instance, you can retrieve information about the file in safe ways, as well as
-move the file to a new location.
+    <input type="file" name="avatar">
 
-Verify A File
--------------
+将返回一个简单的数组::
 
-You can check that a file was actually uploaded via HTTP with no errors by calling the ``isValid()`` method::
+    [
+        'avatar' => // UploadedFile 实例,
+    ];
 
-	if (! $file->isValid())
-	{
-		throw new RuntimeException($file->getErrorString().'('.$file->getError().')');
-	}
+.. note:: UploadedFile 实例对应 ``$_FILES``。即使用户仅点击提交按钮而未上传任何文件，该实例仍然存在。可通过 UploadedFile 的 ``isValid()`` 方法检查文件是否真正上传。详见 :ref:`verify-a-file`。
 
-As seen in this example, if a file had an upload error, you can retrieve the error code (an integer) and the error
-message with the ``getError()`` and ``getErrorString()`` methods. The following errors can be discovered through
-this method:
+如果使用了数组表示法命名，输入字段类似::
 
-* The file exceeds your upload_max_filesize ini directive.
-* The file exceeds the upload limit defined in your form.
-* The file was only partially uploaded.
-* No file was uploaded.
-* The file could not be written on disk.
-* File could not be uploaded: missing temporary directory.
-* File upload was stopped by a PHP extension.
+    <input type="file" name="my-form[details][avatar]">
 
-File Names
-----------
+``getFiles()`` 返回的数组类似::
 
-**getName()**
-
-You can retrieve the original filename provided by the client with the ``getName()`` method. This will typically be the
-filename sent by the client, and should not be trusted. If the file has been moved, this will return the final name of
-the moved file::
-
-	$name = $file->getName();
-
-**getClientName()**
-
-Always returns the original name of the uploaded file as sent by the client, even if the file has been moved::
-
-  $originalName = $file->getClientName();
-
-**getTempName()**
-
-To get the full path of the temp file that was created during the upload, you can use the ``getTempName()`` method::
-
-	$tempfile = $file->getTempName();
+    [
+         'my-form' => [
+            'details' => [
+                'avatar' => // UploadedFile 实例
+            ],
+        ],
+    ]
 
 
-Other File Info
+在某些情况下，可以指定一个文件数组进行上传::
+
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+
+此时返回的文件数组类似::
+
+    [
+        'my-form' => [
+            'details' => [
+                'avatar' => [
+                    0 => // UploadedFile 实例,
+                    1 => // UploadedFile 实例,
+                ],
+            ],
+        ],
+    ]
+
+单个文件
+===========
+
+如果只需访问单个文件，可以使用 ``getFile()`` 直接获取文件实例。将返回一个 ``CodeIgniter\HTTP\Files\UploadedFile`` 实例：
+
+最简单的用法
+--------------
+
+最简单的用法，可能只提交一个文件::
+
+    <input type="file" name="userfile">
+
+将返回一个简单的文件实例：
+
+.. literalinclude:: uploaded_files/004.php
+
+数组表示法
+--------------
+
+如果使用了数组表示法来命名，input 标签类似::
+
+    <input type="file" name="my-form[details][avatar]">
+
+获取文件实例：
+
+.. literalinclude:: uploaded_files/005.php
+
+多个文件
+==============
+
+::
+
+    <input type="file" name="images[]" multiple>
+
+在控制器中：
+
+.. literalinclude:: uploaded_files/006.php
+
+其中 ``images`` 是表单字段名称。
+
+如果有多个文件使用相同的名称，可以使用 ``getFile()`` 逐个检索每个文件。
+
+在控制器中：
+
+.. literalinclude:: uploaded_files/007.php
+
+也可以使用 ``getFileMultiple()``，获取同名的上传文件数组：
+
+.. literalinclude:: uploaded_files/008.php
+
+另一个示例::
+
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+    Upload an avatar: <input type="file" name="my-form[details][avatars][]">
+
+在控制器中：
+
+.. literalinclude:: uploaded_files/009.php
+
+.. note:: 使用 ``getFiles()`` 更为合适。
+
+*********************
+文件操作
+*********************
+
+获取 UploadedFile 实例后，即可安全地获取文件信息，并将文件移动到新位置。
+
+.. _verify-a-file:
+
+验证文件
+=============
+
+调用 ``isValid()`` 方法检查文件是否通过 HTTP 上传且无错误：
+
+.. literalinclude:: uploaded_files/010.php
+
+如上例所示，如果文件上传出错，可通过 ``getError()`` 和 ``getErrorString()`` 方法获取错误代码（整数）和错误消息。通过此方法可以发现以下错误：
+
+* 文件超出 ``upload_max_filesize`` ini 指令限制。
+* 文件超出表单定义的上传限制。
+* 文件仅部分上传。
+* 未上传任何文件。
+* 文件无法写入磁盘。
+* 文件无法上传：缺少临时目录。
+* 文件上传被 PHP 扩展停止。
+
+文件名
+==========
+
+getName()
+---------
+
+使用 ``getName()`` 方法获取客户端提供的原始文件名。通常是客户端发送的文件名，不应完全信任。如果文件已被移动，将返回移动后的最终文件名：
+
+.. literalinclude:: uploaded_files/011.php
+
+getClientName()
 ---------------
 
-**getClientExtension()**
+始终返回客户端上传文件的原始名称，即使文件已被移动：
 
-Returns the original file extension, based on the file name that was uploaded. This is NOT a trusted source. For a
-trusted version, use ``getExtension()`` instead::
+.. literalinclude:: uploaded_files/012.php
 
-	$ext = $file->getClientExtension();
+getTempName()
+-------------
 
-**getClientType()**
+要获取上传时创建的临时文件的完整路径，可以使用 ``getTempName()`` 方法：
 
-Returns the mime type (mime type) of the file as provided by the client. This is NOT a trusted value. For a trusted
-version, use ``getType()`` instead::
+.. literalinclude:: uploaded_files/013.php
 
-	$type = $file->getClientType();
+其他文件信息
+===============
 
-	echo $type; // image/png
+getClientExtension()
+--------------------
 
-Moving Files
-------------
+根据上传的文件名返回原始文件扩展名：
 
-Each file can be moved to its new location with the aptly named ``move()`` method. This takes the directory to move
-the file to as the first parameter::
+.. literalinclude:: uploaded_files/014.php
 
-	$file->move(WRITEPATH.'uploads');
+.. warning:: 这不是可信来源。如需可信版本，请改用 ``guessExtension()``。
 
-By default, the original filename was used. You can specify a new filename by passing it as the second parameter::
+getClientMimeType()
+-------------------
 
-	$newName = $file->getRandomName();
-	$file->move(WRITEPATH.'uploads', $newName);
+返回客户端提供的文件 MIME 类型。这不是可信值。如需可信版本，请改用 ``getMimeType()``：
 
-Once the file has been removed the temporary file is deleted. You can check if a file has been moved already with
-the ``hasMoved()`` method, which returns a boolean::
+.. literalinclude:: uploaded_files/015.php
 
-    if ($file->isValid() && ! $file->hasMoved())
-    {
-        $file->move($path);
-    }
+getClientPath()
+---------------
+
+.. versionadded:: 4.4.0
+
+当客户端通过目录上传文件时，返回 `webkitRelativePath <https://developer.mozilla.org/zh-CN/docs/Web/API/File/webkitRelativePath>`_。在 PHP 8.1 以下版本中，返回 ``null``。
+
+.. literalinclude:: uploaded_files/023.php
+
+移动文件
+============
+
+使用原始文件名
+----------------------
+
+每个文件都可以通过 ``move()`` 方法移动到新位置。第一个参数指定目标目录：
+
+.. literalinclude:: uploaded_files/016.php
+
+默认情况下使用原始文件名。
+
+使用新文件名
+-----------------
+
+可以将新文件名作为第二个参数传入：
+
+.. literalinclude:: uploaded_files/017.php
+
+覆盖现有文件
+-------------------------
+
+默认情况下，如果目标文件已存在，将使用新文件名。例如，如果目录中已存在 **image_name.jpg**，则文件名会自动变为 **image_name_1.jpg**。
+
+要将第三个参数设为 ``true`` 即可覆盖现有文件：
+
+.. literalinclude:: uploaded_files/022.php
+
+检查文件是否已被移动
+-----------------------
+
+文件移动后会删除临时文件。通过 ``hasMoved()`` 方法检查文件是否已被移动，返回布尔值：
+
+.. literalinclude:: uploaded_files/018.php
+
+移动失败时
+-----------------
+
+在以下情况下，移动上传文件可能会失败并抛出 ``HTTPException``：
+
+- 文件已被移动
+- 文件未成功上传
+- 文件移动操作失败（如权限不足）
+
+存储文件
+===========
+
+每个文件都可通过 ``store()`` 方法移动到新位置。
+
+最简单的用法，可能只提交一个文件::
+
+    <input type="file" name="userfile">
+
+默认情况下，上传文件保存在 **writable/uploads** 目录中。会自动创建 **YYYYMMDD** 文件夹和随机文件名。返回文件路径：
+
+.. literalinclude:: uploaded_files/019.php
+
+可以将目标目录作为第一个参数传入。将新文件名作为第二个参数传入：
+
+.. literalinclude:: uploaded_files/020.php
+
+在以下情况下，移动上传文件可能会失败并抛出 ``HTTPException``：
+
+- 文件已被移动
+- 文件未成功上传
+- 文件移动操作失败（如权限不足）

@@ -1,0 +1,31 @@
+版本 4.1.0
+=============
+
+发布日期：2021 年 1 月 31 日
+
+**CodeIgniter4 的 4.1.0 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+不兼容变更
+**********
+
+- ``Autoloader::loadLegacy()`` 方法此前用于迁移到 CodeIgniter v4 时非命名空间类的迁移。从 v4.1.0 开始,此支持已被删除。
+
+变更
+*******
+
+- 不再支持 PHP 7.2
+
+弃用功能
+************
+
+- 弃用 ``Model::fillPlaceholders()`` 方法,请使用 ``Validation::fillPlaceholders()``。
+
+Bug 修复
+**********
+
+有关已修复的 Bug 列表，请参见仓库的
+`CHANGELOG_4.1.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.1.md>`_。

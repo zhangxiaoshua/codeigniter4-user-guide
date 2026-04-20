@@ -1,97 +1,138 @@
-******************
-Working with Files
-******************
+##################
+处理文件
+##################
 
-CodeIgniter provides a File class that wraps the `SplFileInfo <http://php.net/manual/en/class.splfileinfo.php>`_ class
-and provides some additional convenience methods. This class is the base class for :doc:`uploaded files </libraries/uploaded_files>`
-and :doc:`images </libraries/images>`.
+CodeIgniter 提供了一个 File 类，用于封装 `SplFileInfo <https://www.php.net/manual/zh/class.splfileinfo.php>`_ 类，
+并提供一些额外的便捷方法。这个类也是 :doc:`上传文件 </libraries/uploaded_files>`
+和 :doc:`图像 </libraries/images>` 的基类。
 
-.. contents:: Page Contents
+.. contents::
     :local:
+    :depth: 2
 
-Getting a File instance
-=======================
+获取 File 实例
+***********************
 
-You create a new File instance by passing in the path to the file in the constructor. By default the file does not need to exist. However, you can pass an additional argument of "true" to check that the file exist and throw ``FileNotFoundException()`` when it does not.
+通过在构造函数中传入文件路径，即可创建新的 File 实例。
 
-::
+.. literalinclude:: files/001.php
+    :lines: 2-
 
-    $file = new \CodeIgniter\Files\File($path);
+默认情况下，文件不需要实际存在。不过，可额外传入参数 ``true`` 来检查文件是否存在；
+如果不存在，则抛出 ``FileNotFoundException()``。
 
-Taking Advantage of Spl
-=======================
+利用 Spl 的能力
+***********************
 
-Once you have an instance, you have the full power of the SplFileInfo class at the ready, including::
+获得实例后，即可使用 ``SplFileInfo`` 类的完整功能，包括：
 
-    // Get the file's basename
-    echo $file->getBasename();
-    // Get last modified time
-    echo $file->getMTime();
-    // Get the true realpath
-    echo $file->getRealpath();
-    // Get the file permissions
-    echo $file->getPerms();
+.. literalinclude:: files/002.php
+    :lines: 2-
 
-    // Write CSV rows to it.
-    if ($file->isWritable())
-    {
-        $csv = $file->openFile('w');
+新增功能
+************
 
-        foreach ($rows as $row)
-        {
-            $csv->fputcsv($row);
-        }
-    }
+除了 SplFileInfo 类的全部方法外，File 还提供了一些新工具。
 
-New Features
+getRandomName()
+===============
+
+通过 ``getRandomName()`` 方法，可生成一个密码学安全的随机文件名，并在前面附加当前时间戳。
+在移动文件时，这对于重命名文件特别有用，因为文件名将无法被猜测：
+
+.. literalinclude:: files/003.php
+    :lines: 2-
+
+getSize()
+=========
+
+返回文件大小，单位为字节：
+
+.. literalinclude:: files/004.php
+    :lines: 2-
+
+如果文件不存在或发生错误，将抛出 ``RuntimeException``。
+
+getSizeByUnit()
+===============
+
+.. deprecated:: 4.6.0
+
+默认以字节为单位返回文件大小。第一个参数可传入 ``'kb'`` 或 ``'mb'``，
+分别以 KiB 或 MiB 返回结果：
+
+.. literalinclude:: files/005.php
+    :lines: 2-
+
+如果文件不存在或发生错误，将抛出 ``RuntimeException``。
+
+
+.. _file-get-size-by-binary-unit:
+
+getSizeByBinaryUnit()
+=====================
+
+.. versionadded:: 4.6.0
+
+默认以字节为单位返回文件大小。第一个参数可传入不同的 FileSizeUnit 值，
+分别以 KiB、MiB 等单位返回结果。第二个参数可传入精度值，用于定义小数位数。
+
+.. literalinclude:: files/017.php
+    :lines: 4-
+
+如果文件不存在或发生错误，将抛出 ``RuntimeException``。
+
+
+.. _file-get-size-by-metric-unit:
+
+getSizeByMetricUnit()
+=====================
+
+.. versionadded:: 4.6.0
+
+默认以字节为单位返回文件大小。第一个参数可传入不同的 FileSizeUnit 值，
+分别以 kB、MB 等单位返回结果。第二个参数可传入精度值，用于定义小数位数。
+
+.. literalinclude:: files/018.php
+    :lines: 4-
+
+如果文件不存在或发生错误，将抛出 ``RuntimeException``。
+
+getMimeType()
+=============
+
+获取文件的媒体类型（MIME 类型）。在判定文件类型时，会尽可能使用被认为更安全的方
+法：
+
+.. literalinclude:: files/006.php
+    :lines: 2-
+
+guessExtension()
+================
+
+尝试基于可信的 ``getMimeType()`` 方法判断文件扩展名。如果 MIME 类型未知，则返回
+null。与直接使用文件扩展名相比，这通常更可信。扩展名的判断依据为
+**app/Config/Mimes.php** 中的值：
+
+.. literalinclude:: files/007.php
+    :lines: 2-
+
+移动文件
 ============
 
-In addition to all of the methods in the SplFileInfo class, you get some new tools.
+每个文件都可以使用 ``move()`` 方法移动到新位置。第一个参数为要移
+动到的目录：
 
-**getRandomName()**
+.. literalinclude:: files/008.php
+    :lines: 2-
 
-You can generate a cryptographically secure random filename, with the current timestamp prepended, with the ``getRandomName()``
-method. This is especially useful to rename files when moving it so that the filename is unguessable::
+默认使用原始文件名。第二个参数可传入新的文件名：
 
-	// Generates something like: 1465965676_385e33f741.jpg
-	$newName = $file->getRandomName();
+.. literalinclude:: files/009.php
+    :lines: 2-
 
-**getSize()**
+``move()`` 方法会返回一个新的 File 实例，表示已重新定位的文件。因此，如需使
+用新位置，必须保存返回结果：
 
-Returns the size of the uploaded file in bytes. You can pass in either 'kb' or 'mb' as the first parameter to get
-the results in kilobytes or megabytes, respectively::
-
-	$bytes     = $file->getSize();      // 256901
-	$kilobytes = $file->getSize('kb');  // 250.880
-	$megabytes = $file->getSize('mb');  // 0.245
-
-**getMimeType()**
-
-Retrieve the media type (mime type) of the file. Uses methods that are considered as secure as possible when determining
-the type of file::
-
-	$type = $file->getMimeType();
-
-	echo $type; // image/png
-
-**guessExtension()**
-
-Attempts to determine the file extension based on the trusted ``getMimeType()`` method. If the mime type is unknown,
-will return null. This is often a more trusted source than simply using the extension provided by the filename. Uses
-the values in **application/Config/Mimes.php** to determine extension::
-
-	// Returns 'jpg' (WITHOUT the period)
-	$ext = $file->guessExtension();
-
-Moving Files
-------------
-
-Each file can be moved to its new location with the aptly named ``move()`` method. This takes the directory to move
-the file to as the first parameter::
-
-	$file->move(WRITEPATH.'uploads');
-
-By default, the original filename was used. You can specify a new filename by passing it as the second parameter::
-
-	$newName = $file->getRandomName();
-	$file->move(WRITEPATH.'uploads', $newName);
+.. literalinclude:: files/010.php
+    :lines: 2-

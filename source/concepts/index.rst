@@ -1,15 +1,17 @@
 #####################
-CodeIgniter4 Overview
+CodeIgniter4 概览
 #####################
 
-The following pages describe the architectural concepts behind CodeIgniter4:
+以下页面描述了 CodeIgniter4 背后的架构概念:
 
 .. toctree::
-	:titlesonly:
+    :titlesonly:
 
-	structure
-	mvc
-	autoloader
-	services
-	http
-	security
+    structure
+    mvc
+    autoloader
+    services
+    factories
+    http
+    security
+    goals

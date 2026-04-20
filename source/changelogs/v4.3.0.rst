@@ -1,0 +1,368 @@
+版本 4.3.0
+#############
+
+发布日期：2023 年 1 月 10 日
+
+**CodeIgniter4 的 4.3.0 版本发布**
+
+.. contents::
+    :local:
+    :depth: 3
+
+亮点
+**********
+
+- 查询构建器支持 **upsert()**、**upsertBatch()**、**deleteBatch()**,
+  现在 ***batch()** 方法可以从查询中设置数据
+  (*由* `sclubricants <https://github.com/sclubricants>`_ *贡献*)。
+  详情请参阅 `查询构建器`_。
+- 数据库 Forge 支持在 **现有表中添加索引** 和
+  **命名索引** (*由* `sclubricants <https://github.com/sclubricants>`_ *贡献*)。
+  详情请参阅 `Forge`_。
+- 为了使默认配置更安全,默认验证规则
+  已更改为 **严格规则**。
+- 当数据库错误发生时,会抛出异常的条件和
+  可以抛出的异常类已发生变化。
+  请参阅 :ref:`exceptions-when-database-errors-occur`。
+
+不兼容变更
+**********
+
+行为变化
+================
+
+.. _exceptions-when-database-errors-occur:
+
+数据库错误时抛出的异常
+-------------------------------------
+
+- 数据库连接类抛出的异常已更改为 ``CodeIgniter\Database\Exceptions\DatabaseException``。以前,不同的数据库驱动程序会抛出不同的异常类,但这些已经统一为 ``DatabaseException``。
+- 准备好的查询的 ``execute()`` 方法抛出的异常已更改为 ``DatabaseException``。以前,不同的数据库驱动程序可能会抛出不同的异常类,或者不抛出异常,但这些已统一为 ``DatabaseException``。
+- 在事务期间,即使 ``DBDebug`` 为 true,默认情况下也不会抛出异常。
+- ``DBDebug`` 和 ``CI_DEBUG`` 变化
+
+    - 为了在不同环境下保持一致的行为, ``Config\Database::$default['DBDebug']``
+      和 ``Config\Database::$tests['DBDebug']`` 默认更改为 ``true``。通过这些
+      设置,当数据库错误发生时,总是会抛出异常。以前,在生产环境中默认为 ``false``。
+    - 现在,如果 ``$DBDebug`` 为 true,则在 ``BaseBuilder`` 中抛出的 ``DatabaseException`` 会被抛出。
+      以前,如果 ``CI_DEBUG`` 为 true 则会抛出。
+    - ``BaseConnection::$DBDebug`` 的默认值已更改为 ``true``。
+    - 通过这些更改, ``DBDebug`` **现在表示数据库错误发生时是否抛出异常**。
+      虽然与调试无关,但名称未更改。
+    - 当 ``DBDebug`` 为 ``true`` 运行事务时,即使查询错误也不会抛出异常。以前,如果发生查询错误,
+      所有查询都会回滚,并抛出异常,因此 :ref:`transactions-managing-errors` 或
+      :ref:`transactions-manual-transactions` 不起作用。
+    - 现在,在 ``Model`` 中删除没有 WHERE 子句时,即使
+      ``CI_DEBUG`` 为 false 也会抛出 ``DatabaseException``。以前,如果 ``CI_DEBUG`` 为 true 则会抛出。
+
+异常发生时的 HTTP 状态码和退出代码
+----------------------------------------------------
+
+以前,CodeIgniter 的异常处理程序在某些情况下会使用 *异常代码* 作为 *HTTP 状态码*,并根据异常代码计算 *退出代码*。但是异常代码与 HTTP 状态码或退出代码之间不应该有逻辑联系。
+
+- 现在,异常处理程序默认将 HTTP 状态码设置为 ``500``,并将退出代码设置为常量 ``EXIT_ERROR`` (= ``1``)。
+- 你可以在异常类中实现 ``HTTPExceptionInterface`` 或 ``HasExitCodeInterface`` 来更改 HTTP 状态码或退出代码。请参阅 :ref:`error-specify-http-status-code` 和 :ref:`error-specify-exit-code`。
+
+例如,退出代码已发生如下更改:
+
+- 如果发生未捕获的 ``ConfigException``,退出代码将是 ``EXIT_CONFIG`` (= ``3``),而不是 ``12``。
+- 如果发生未捕获的 ``CastException``,退出代码将是 ``EXIT_CONFIG`` (= ``3``),而不是 ``9``。
+- 如果发生未捕获的 ``DatabaseException``,退出代码将是 ``EXIT_DATABASE`` (= ``8``),而不是 ``17``。
+
+.. _v430-time-fix:
+
+时间
+----
+
+:doc:`时间 <../libraries/time>` 类的以下方法存在会更改当前对象状态的错误。为了修复这些错误,时间类已被修复:
+
+    - ``add()``
+    - ``modify()``
+    - ``setDate()``
+    - ``setISODate()``
+    - ``setTime()``
+    - ``sub()``
+
+- 现在 ``Time`` 类扩展 ``DateTimeImmutable`` 并完全是不可变的。
+- 添加了 ``TimeLegacy`` 类用于向后兼容性,它的行为与未修改的 ``Time`` 类相同。
+
+其他
+------
+
+- **辅助函数:** :php:func:`script_tag()` 和 :php:func:`safe_mailto()` 不再在 ``<script>`` 标签中输出 ``type="text/javascript"``。
+- **CLI:** 由于 Spark 命令处理的更改, ``spark`` 文件已更改。
+- **CLI:** ``CITestStreamFilter::$buffer = ''`` 不再导致过滤器注册为侦听流。现在有一个 ``CITestStreamFilter::registration()`` 方法用于此目的。详情请参阅 :ref:`upgrade-430-stream-filter`。
+- **数据库:** ``BaseBuilder::_whereIn()`` 中的 ``InvalidArgumentException`` 是 ``LogicException`` 的一种,不会被配置禁止。以前如果 ``CI_DEBUG`` 为 false,异常会被禁止。
+- **数据库:** :ref:`BaseConnection::getForeignKeyData() <metadata-getforeignkeydata>` 返回的数据结构已更改。
+- **数据库:** ``CodeIgniter\Database\BasePreparedQuery`` 类现在对写入类型的查询返回布尔值,而不是 ``Result`` 类对象。
+- **模型:** 如果 ``Model::update()`` 方法生成没有 WHERE 子句的 SQL 语句,现在会引发 ``DatabaseException``;模型不支持更新所有记录的操作。
+- **路由:** ``RouteCollection::resetRoutes()`` 会重置自动发现路由。以前一旦发现,即使调用 ``RouteCollection::resetRoutes()``,RouteCollection 也不会再发现 Routes 文件。
+
+.. _v430-interface-changes:
+
+接口变更
+=================
+
+.. note:: 只要你没有扩展相关的 CodeIgniter 核心类
+    或实现这些接口,所有这些变化都是向后兼容的,
+    不需要任何干预。
+
+OutgoingRequestInterface
+------------------------
+
+- 添加新的 ``OutgoingRequestInterface``,表示传出请求。
+- 添加新的 ``OutgoingRequest`` 类,实现 ``OutgoingRequestInterface``。
+- 现在 ``RequestInterface`` 扩展 ``OutgoingRequestInterface``。
+- 现在 ``CURLRequest`` 扩展 ``OutgoingRequest``。
+- 现在 ``Request`` 扩展 ``OutgoingRequest``。
+
+其他
+------
+
+- **HTTP:** 在 ``MessageInterface`` 中添加了缺失的 ``getProtocolVersion()``、``getBody()``、``hasHeader()`` 和 ``getHeaderLine()`` 方法。
+- **HTTP:** 现在 ``ResponseInterface`` 扩展 ``MessageInterface``。
+- **HTTP:** 添加了缺失的 ``ResponseInterface::getCSP()`` (和 ``Response::getCSP()`` ), ``ResponseInterface::getReasonPhrase()`` 和 ``ResponseInterface::getCookieStore()`` 方法。
+- **数据库:** 添加了缺失的 ``CodeIgniter\Database\ResultInterface::getNumRows()`` 方法。
+- 参阅 `验证变更`_。
+
+方法签名变化
+========================
+
+.. _v430-validation-changes:
+
+验证变更
+------------------
+
+ValidationInterface
+^^^^^^^^^^^^^^^^^^^
+
+``ValidationInterface`` 已更改,以消除 ``ValidationInterface`` 与 ``Validation`` 类之间的不匹配。
+
+- 为 ``ValidationInterface::run()`` 添加了第三个参数 ``$dbGroup``。
+- 接口中添加了以下方法:
+
+    - ``ValidationInterface::setRule()``
+    - ``ValidationInterface::getRules()``
+    - ``ValidationInterface::getRuleGroup()``
+    - ``ValidationInterface::setRuleGroup()``
+    - ``ValidationInterface::loadRuleGroup()``
+    - ``ValidationInterface::hasError()``
+    - ``ValidationInterface::listErrors()``
+    - ``ValidationInterface::showError()``
+
+Validation
+^^^^^^^^^^
+
+当 ``$group`` 为空时, ``Validation::loadRuleGroup()`` 的返回值已从 ``null`` 更改为 ``[]``。
+
+数据库
+--------
+
+- ``CodeIgniter\Database\BasePreparedQuery::close()`` 和 ``CodeIgniter\Database\PreparedQueryInterface`` 的返回类型已更改为 ``bool`` (之前未定义)。
+- ``CodeIgniter\Database\Database::loadForge()`` 的返回类型已更改为 ``Forge``。
+- ``CodeIgniter\Database\Database::loadUtils()`` 的返回类型已更改为 ``BaseUtils``。
+- ``Table::dropForeignKey()`` 中的参数名 ``$column`` 已更改为 ``$foreignName``。
+- ``BaseBuilder::updateBatch()`` 的第二个参数 ``$index`` 已更改为 ``$constraints``。它现在接受 array、string 或 ``RawSql`` 类型。扩展类也应相应更改类型。
+- ``BaseBuilder::insertBatch()`` 和 ``BaseBuilder::updateBatch()`` 的 ``$set`` 参数现在接受单行数据的对象。
+- ``BaseBuilder::_updateBatch()``
+    - 第二个参数 ``$values`` 已更改为 ``$keys``。
+    - 第三个参数 ``$index`` 已更改为 ``$values``。参数类型也已更改为 ``array``。
+
+数据库 Forge
+--------------
+
+- ``Forge::dropKey()`` 的方法签名已更改。添加了一个可选参数 ``$prefixKeyName``。
+- ``Forge::addKey()`` 的方法签名已更改。添加了一个可选参数 ``$keyName``。
+- ``Forge::addPrimaryKey()`` 的方法签名已更改。添加了一个可选参数 ``$keyName``。
+- ``Forge::addUniqueKey()`` 的方法签名已更改。添加了一个可选参数 ``$keyName``。
+- 以下方法添加了一个额外的 ``$asQuery`` 参数。当设置为 ``true`` 时,该方法返回一个独立的 SQL 查询。
+
+    - ``CodeIgniter\Database\Forge::_processPrimaryKeys()``
+- 除了上面添加的 ``$asQuery`` 参数外,以下方法现在也返回一个数组。
+
+    - ``CodeIgniter\Database\Forge::_processIndexes()``
+    - ``CodeIgniter\Database\Forge::_processForeignKeys()``
+
+其他
+------
+
+- **API:** ``API\ResponseTrait::failServerError()`` 的返回类型已更改为 ``ResponseInterface``。
+- 以下方法已更改为接受 ``ResponseInterface`` 作为参数,而不是 ``Response``。
+
+    - ``Debug\Exceptions::__construct()``
+    - ``Services::exceptions()``
+
+- **Request:** ``IncomingRequest::getJsonVar()`` 的 ``$index`` 参数现在接受 ``array``、``string`` 或 ``null`` 值。
+
+增强功能
+************
+
+命令
+========
+
+- 从 ``CodeIgniter\CodeIgniter`` 类中提取了 Spark 命令的调用处理程序。这将减少控制台调用的成本。
+- 添加了 ``spark filter:check`` 命令来检查路由的过滤器。详情请参阅 :ref:`Controller Filters <spark-filter-check>`。
+- 添加了 ``spark make:cell`` 命令来创建新的 Cell 文件及其视图。详情请参阅 :ref:`generating-cell-via-command`。
+- 现在 ``spark routes`` 命令显示路由名称。请参阅 :ref:`URI 路由 <routing-spark-routes>`。
+- 现在 ``spark routes`` 命令可以按处理程序排序输出。
+  请参阅 :ref:`routing-spark-routes-sort-by-handler`。
+
+- 现在可以使用 ``--help`` 选项访问 spark 命令的帮助信息(例如 ``php spark serve --help``)
+- 添加了 ``CLI::promptByMultipleKeys()`` 方法以支持多值输入,与 ``promptByKey()`` 不同。详情请参阅 :ref:`prompt-by-multiple-keys`。
+- HTTP/3 现在被视为有效协议。
+
+测试
+=======
+
+- 添加了 ``StreamFilterTrait`` 以更轻松地使用从 STDOUT 和 STDERR 流中捕获数据。请参阅 :ref:`testing-cli-output`。
+- CITestStreamFilter 过滤器类现在实现了向流添加过滤器的方法。请参阅 :ref:`testing-cli-output`。
+- 添加了 ``PhpStreamWrapper`` 以更轻松地使用 ``php://stdin`` 设置数据。请参阅 :ref:`testing-cli-input`。
+- 添加了 :ref:`benchmark-timer-record` 方法来测量可调用的性能。还增强了通用函数 ``timer()`` 以接受可选的可调用。
+- 将布尔第三参数 ``$useExactComparison`` 添加到 ``TestLogger::didLog()``,它设置是否逐字检查日志消息。默认为 ``true``。
+- 添加了 ``CIUnitTestCase::assertLogContains()`` 方法,它通过消息的一部分而不是整个消息来比较日志消息。
+
+数据库
+========
+
+查询构建器
+-------------
+
+- 向 QueryBuilder 添加了 ``upsert()`` 和 ``upsertBatch()`` 方法。参见 :ref:`upsert-data`。
+- 向 QueryBuilder 添加了 ``deleteBatch()`` 方法。参见 :ref:`delete-batch`。
+- 添加了 ``when()`` 和 ``whenNot()`` 方法以有条件地向查询添加子句。详情请参阅 :ref:`BaseBuilder::when() <db-builder-when>`。
+- 改进了 ``Builder::updateBatch()`` 的 SQL 结构。详情请参阅 :ref:`update-batch`。
+- 添加了 ``BaseBuilder::setQueryAsData()``,它允许从查询中使用 ``insertBatch()``、``updateBatch()``、``upsertBatch()``、``deleteBatch()``。参见 :ref:`insert-batch-data`。
+
+Forge
+-----
+
+- 添加了 ``Forge::processIndexes()``,允许在现有表上创建索引。详情请参阅 :ref:`db-forge-adding-keys-to-a-table`。
+- 现在可以手动设置索引名称。这些方法包括:``Forge::addKey()``、``Forge::addPrimaryKey()`` 和 ``Forge::addUniqueKey()``
+- 新的 ``Forge::dropPrimaryKey()`` 方法允许删除表上的主键。参见 :ref:`dropping-a-primary-key`。
+- 修复了 ``Forge::dropKey()``,以允许删除唯一索引。这需要 ``DROP CONSTRAINT`` SQL命令。
+- :php:meth:`CodeIgniter\\Database\\Forge::addForeignKey()` 现在包括一个名称参数来手动设置外键名称。SQLite3 不支持此功能。
+- SQLSRV 现在在使用 :ref:`Forge::dropColumn() <db-forge-dropcolumn>` 时会自动删除 ``DEFAULT`` 约束。
+
+其他
+------
+
+- SQLite3 有一个新的配置项 ``busyTimeout`` 来设置表锁定时的超时。
+- ``BaseConnection::escape()`` 现在排除 ``RawSql`` 数据类型。这允许将 SQL 字符串传递到数据中。
+- 改进了 :ref:`BaseConnection::getForeignKeyData() <metadata-getforeignkeydata>` 返回的数据。所有 DBMS 返回相同的结构。
+- SQLite :ref:`BaseConnection::getIndexData() <db-metadata-getindexdata>` 现在可以为 `AUTOINCREMENT` 列返回伪索引名为 ``PRIMARY``,并且每个返回的索引数据都有 ``type`` 属性。
+- ``BasePreparedQuery::close()`` 现在在所有 DBMS 中都会释放准备好的语句。以前,它们在 Postgre、SQLSRV 和 OCI8 中没有被释放。参见 :ref:`database-queries-stmt-close`。
+- 添加了 ``BaseConnection::transException()`` 用于在事务过程中抛出异常。参见：:ref:`transactions-throwing-exceptions`。
+
+模型
+=====
+
+- 向 ``BaseModel::insertBatch()`` 和 ``BaseModel::updateBatch()`` 方法添加了 before 和 after 事件。请参阅 :ref:`model-events-callbacks`。
+- 添加了 ``Model::allowEmptyInserts()`` 方法以插入空数据。请参阅 :ref:`Using CodeIgniter's Model <model-allow-empty-inserts>`
+- 为 Entity 添加了新的 :ref:`entities-property-casting` 类 ``IntBoolCast``。
+
+库
+=========
+
+- **Publisher:** 在 Publisher 中添加了 ``replace()``、``addLineAfter()`` 和 ``addLineBefore()`` 方法以修改文件。详情请参阅 :ref:`Publisher <publisher-modifying-files>`。
+- **Encryption:** 现在 Encryption 可以解密使用 CI3 Encryption 加密的数据。请参阅 :ref:`encryption-compatible-with-ci3`。
+- **CURLRequest:** 在 :ref:`CURLRequest <curlrequest-version>` 中添加了 HTTP2 版本选项。
+
+辅助函数和函数
+=====================
+
+- 现在可以通过 **app/Config/Autoload.php** 自动加载辅助函数。
+- 添加了新的表单辅助函数 :php:func:`validation_errors()`、:php:func:`validation_list_errors()` 和 :php:func:`validation_show_error()` 来显示验证错误。
+- 如果你将 locale 值作为最后一个参数传入,可以为 :php:func:`route_to()` 设置 locale。
+- 添加了 :php:func:`request()` 和 :php:func:`response()` 函数。
+- 添加了 :php:func:`decamelize()` 函数将 camelCase 转换为 snake_case。
+- 添加了 :php:func:`is_windows()` 全局函数来检测 Windows 平台。
+
+HTML5 兼容性
+===================
+
+通过在 **app/Config/DocTypes.php** 中设置 ``$html5`` 属性,可以配置创建诸如 ``<input>`` 之类的空 HTML 元素时是否排除或包含 solidus 字符 (``/``) 和右尖括号 ``(>)`` 之间的字符。如果将其设置为 ``true``,则会输出不带 ``/`` 的 HTML5 兼容标签,如 ``<br>``。
+
+以下项目会受到影响:
+
+- 排版类:创建 ``br`` 标签
+- 视图解析器: ``nl2br`` 过滤器
+- 诱饵模式:``input`` 标签
+- 表单辅助函数
+- HTML 辅助函数
+- 常用函数
+
+错误处理
+==============
+
+- 现在可以记录弃用警告而不是抛出异常。详情请参阅 :ref:`logging_deprecation_warnings`。
+- 弃用的记录默认启用。
+- 要 *临时* 启用弃用抛出,请将环境变量 ``CODEIGNITER_SCREAM_DEPRECATIONS`` 设置为真值。
+- ``Config\Logger::$threshold`` 现在默认为特定于环境。对于生产环境,默认阈值仍为 ``4``,但对于其他环境已更改为 ``9``。
+
+.. _v430-multiple-domain-support:
+
+多域名支持
+=======================
+
+- 添加了 ``Config\App::$allowedHostnames`` 以设置基准 URL 中主机名以外的主机名。
+- 如果设置了 ``Config\App::$allowedHostnames``,当当前 URL 匹配时,诸如 :php:func:`base_url()`、:php:func:`current_url()`、:php:func:`site_url()` 之类的与 URL 相关的函数将返回使用 ``Config\App::$allowedHostnames`` 中设置的主机名的 URL。
+
+其他
+======
+
+- **路由:** 添加了 ``$routes->useSupportedLocalesOnly(true)``,以便当 URL 中的 locale 不在 ``Config\App::$supportedLocales`` 中受支持时,路由器返回 404 Not Found。请参阅 :ref:`Localization <localization-in-routes>`
+- **路由:** 添加了新的 ``$routes->view()`` 方法以直接返回视图。请参阅 :ref:`View Routes <view-routes>`。
+- **视图:** 视图 Cell 现在是一等公民,可以位于 **app/Cells** 目录中。请参阅 :ref:`View Cells <app-cells>`。
+- **视图:** 添加了“受控 Cell”,为你的视图 Cell 提供了更多结构和灵活性。详情请参阅 :ref:`View Cells <controlled-cells>`。
+- **验证:** 添加了闭包验证规则。详情请参阅 :ref:`validation-using-closure-rule`。
+- **配置:** 现在可以指定要手动发现的 Composer 包。请参阅 :ref:`Code Modules <modules-specify-composer-packages>`。
+- **配置:** 添加了 ``Config\Session`` 类来处理会话配置。
+- **调试:** 将 Kint 更新到 5.0.2。
+- **请求:** 添加了新的 ``$request->getRawInputVar()`` 方法从原始流中返回指定变量。请参阅 :ref:`Retrieving Raw data <incomingrequest-retrieving-raw-data>`。
+- **请求:** 添加了新的 ``$request->is()`` 方法来查询请求类型。
+  请参阅 :ref:`Determining Request Type <incomingrequest-is>`。
+
+消息变更
+***************
+
+- 更新英文语言字符串以保持更一致。
+- 添加了 ``CLI.generator.className.cell`` 和 ``CLI.generator.viewName.cell``。
+- 添加了 **en/Errors.php** 文件。
+
+变更
+*******
+
+- 配置
+    - ``Config`` 类中的所有原子类型属性现已加类型。
+    - 有关更改默认值的信息,请参阅 :ref:`Upgrading <upgrade_430_config>`。
+- 更改了 Spark 命令的处理:
+    - ``CodeIgniter\CodeIgniter`` 不再处理 Spark 命令。
+    - 已删除 ``CodeIgniter::isSparked()`` 方法。
+    - 已删除 ``CodeIgniter\CLI\CommandRunner`` 类,因为 Spark 命令处理发生了变化。
+    - 已删除系统路由配置文件 ``system/Config/Routes.php``。
+    - 应用路由配置文件 ``app/Config/Routes.php`` 已更改。删除系统路由配置文件的包含。
+
+弃用功能
+************
+
+- 弃用 ``RouteCollection::localizeRoute()``。
+- 弃用 ``RouteCollection::fillRouteParams()``。请使用 ``RouteCollection::buildReverseRoute()``。
+- 弃用 ``BaseBuilder::setUpdateBatch()`` 和 ``BaseBuilder::setInsertBatch()``。请使用 ``BaseBuilder::setData()``。
+- 弃用公共属性 ``Response::$CSP``。它将变为 protected。请使用 ``Response::getCSP()``。
+- 弃用 ``CodeIgniter::$path`` 和 ``CodeIgniter::setPath()``。不再使用。
+- 弃用公共属性 ``IncomingRequest::$uri``。它将变为 protected。请使用 ``IncomingRequest::getUri()``。
+- 弃用公共属性 ``IncomingRequest::$config``。它将变为 protected。
+- 弃用 ``CLI::isWindows()`` 方法。请使用 ``is_windows()``。
+- 弃用 ``Config\App`` 中的会话属性,改用新的会话配置类 ``Config\Session``。
+
+Bug 修复
+**********
+
+- 修复了所有类型的“准备查询”在写入类型查询中返回 ``Result`` 对象而不是 bool 值的错误。
+- 修复了在使用 ``IncomingRequest::getVar()`` 或 ``IncomingRequest::getJsonVar()`` 方法时 JSON 请求中的变量过滤的错误。
+- 修复了在使用指定索引调用 ``IncomingRequest::getVar()`` 或 ``IncomingRequest::getJsonVar()`` 方法时可能更改变量类型的错误。
+- 修复了启用 CSP 时 Honeypot 字段出现的错误。另请参阅 :ref:`upgrade-430-honeypot-and-csp`。
+
+请查看仓库的
+`CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_
+以获取完整的 Bug 修复列表。

@@ -1,54 +1,60 @@
 ####################
-Query Helper Methods
+查询辅助方法
 ####################
 
-Information From Executing a Query
-==================================
+.. contents::
+    :local:
+    :depth: 2
 
-**$db->insertID()**
+执行查询后的信息
+**********************************
 
-The insert ID number when performing database inserts.
+$db->insertID()
+===============
 
-.. note:: If using the PDO driver with PostgreSQL, or using the Interbase
-	driver, this function requires a $name parameter, which specifies the
-	appropriate sequence to check for the insert id.
+执行数据库插入操作时，返回插入记录的 ID 号。
 
-**$db->affectedRows()**
+.. note:: 如果使用 PDO 驱动连接 PostgreSQL，或使用 Interbase 驱动，此函数需要一个 $name 参数，用于指定检查插入 ID 的相应序列。
 
-Displays the number of affected rows, when doing "write" type queries
-(insert, update, etc.).
+$db->affectedRows()
+===================
 
-.. note:: In MySQL "DELETE FROM TABLE" returns 0 affected rows. The database
-	class has a small hack that allows it to return the correct number of
-	affected rows. By default this hack is enabled but it can be turned off
-	in the database driver file.
+执行“写”类型查询（如 insert、update 等）时，显示受影响的行数。
 
-**$db->getLastQuery()**
+.. note:: 在 MySQL 中，执行 "DELETE FROM TABLE" 会返回 0 个受影响的行。数据库类有一个小的 hack 可以让它返回正确的受影响行数。默认情况下此 hack 是启用的，但可以在数据库驱动文件中将其关闭。
 
-Returns a Query object that represents the last query that was run (the query string, not the result).
+$db->getLastQuery()
+===================
 
-Information About Your Database
-===============================
+返回一个代表最后执行的查询的 Query 对象（即查询语句本身，而非查询结果）。
 
-**$db->countAll()**
+关于数据库的信息
+*******************************
 
-Permits you to determine the number of rows in a particular table.
-Submit the table name in the first parameter. This is part of Query Builder.
-Example::
+$db->countAll()
+===============
 
-	echo $db->table('my_table')->countAll();
+用于确定特定表中的行数。将表名作为第一个参数传入。这是查询构建器的一部分。
 
-	// Produces an integer, like 25
+.. literalinclude:: helpers/001.php
 
-**$db->getPlatform()**
+$db->countAllResults()
+======================
 
-Outputs the database platform you are running (MySQL, MS SQL, Postgres,
-etc...)::
+用于确定特定结果集中的行数。将表名作为第一个参数传入。这是查询构建器的一部分。
 
-	echo $db->getPlatform();
+.. literalinclude:: helpers/002.php
 
-**$db->getVersion()**
+$db->getPlatform()
+==================
 
-Outputs the database version you are running::
+输出你正在运行的数据库平台（DBDriver），如 MySQLi、SQLSRV、Postgre 等：
 
-	echo $db->getVersion();
+.. literalinclude:: helpers/003.php
+
+$db->getVersion()
+=================
+
+输出你正在运行的数据库版本：
+
+.. literalinclude:: helpers/004.php

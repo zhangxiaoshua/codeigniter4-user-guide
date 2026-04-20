@@ -1,0 +1,62 @@
+版本 4.1.4
+=============
+
+发布日期：2021 年 9 月 6 日
+
+**CodeIgniter4 的 4.1.4 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+本次发布侧重于代码样式。除下面提到的变更外,所有变更都是为了使代码符合新的
+`CodeIgniter 编码标准 <https://github.com/CodeIgniter/coding-standard>`_ (基于 PSR-12)而进行的视觉调整。
+
+不兼容变更
+----------
+
+- 以下方法已从“public”改为“protected”,以匹配其父类方法并更好地与其用法对齐:
+
+    * ``CodeIgniter\Database\MySQLi\Connection::execute()``
+    * ``CodeIgniter\Database\MySQLi\Connection::_fieldData()``
+    * ``CodeIgniter\Database\MySQLi\Connection::_indexData()``
+    * ``CodeIgniter\Database\MySQLi\Connection::_foreignKeyData()``
+    * ``CodeIgniter\Database\Postgre\Builder::_like_statement()``
+    * ``CodeIgniter\Database\Postgre\Connection::execute()``
+    * ``CodeIgniter\Database\Postgre\Connection::_fieldData()``
+    * ``CodeIgniter\Database\Postgre\Connection::_indexData()``
+    * ``CodeIgniter\Database\Postgre\Connection::_foreignKeyData()``
+    * ``CodeIgniter\Database\SQLSRV\Connection::execute()``
+    * ``CodeIgniter\Database\SQLSRV\Connection::_fieldData()``
+    * ``CodeIgniter\Database\SQLSRV\Connection::_indexData()``
+    * ``CodeIgniter\Database\SQLSRV\Connection::_foreignKeyData()``
+    * ``CodeIgniter\Database\SQLite3\Connection::execute()``
+    * ``CodeIgniter\Database\SQLite3\Connection::_fieldData()``
+    * ``CodeIgniter\Database\SQLite3\Connection::_indexData()``
+    * ``CodeIgniter\Database\SQLite3\Connection::_foreignKeyData()``
+    * ``CodeIgniter\Images\Handlers\GDHandler::_flatten()``
+    * ``CodeIgniter\Images\Handlers\GDHandler::_flip()``
+    * ``CodeIgniter\Images\Handlers\ImageMagickHandler::_flatten()``
+    * ``CodeIgniter\Images\Handlers\ImageMagickHandler::_flip()``
+    * ``CodeIgniter\Test\Mock\MockIncomingRequest::detectURI()``
+    * ``CodeIgniter\Test\Mock\MockSecurity.php::sendCookie()``
+
+- 为了与 PHP 8.1 的严格继承检查兼容,在可能的情况下,以下方法签名添加了返回类型以匹配其父类签名:
+
+    * ``CodeIgniter\Cookie\Cookie::offsetExists()``
+    * ``CodeIgniter\Cookie\Cookie::offsetSet()``
+    * ``CodeIgniter\Cookie\Cookie::offsetUnset()``
+    * ``CodeIgniter\Cookie\CookieStore::getIterator()``
+    * ``CodeIgniter\I18n\Time::__wakeup()``
+    * ``CodeIgniter\Test\Filters\CITestStreamFilter::filter()``
+
+- 与 PHP 8.1 的严格继承检查相关,实现 ``SessionHandlerInterface`` 的以下会话处理程序的公共方法已修改为与接口匹配:
+
+    * ``CodeIgniter\Session\Handlers\ArrayHandler``
+    * ``CodeIgniter\Session\Handlers\DatabaseHandler``
+    * ``CodeIgniter\Session\Handlers\FileHandler``
+    * ``CodeIgniter\Session\Handlers\MemcachedHandler``
+    * ``CodeIgniter\Session\Handlers\RedisHandler``
+
+有关完整的更改列表，请参阅仓库的
+`CHANGELOG_4.1.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.1.md>`_。

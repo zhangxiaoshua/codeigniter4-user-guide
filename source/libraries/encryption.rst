@@ -1,397 +1,307 @@
 ##################
-Encryption Service
+加密服务
 ##################
 
-.. important:: DO NOT use this or any other *encryption* library for
-	user password storage! Passwords must be *hashed* instead, and you
-	should do that via PHP's own `Password Hashing extension
-	<http://php.net/password>`_.
+.. important:: 请勿使用本 Encryption 类或其他任何加密类来存储密码！密码应当进行哈希处理，
+    可通过 PHP 的 `Password Hashing 扩展 <https://www.php.net/manual/zh/book.password.php>`_ 完成。
 
-The Encryption Service provides two-way symmetric (secret key) data encryption. 
-The encryption manager will instantiate and/or initialize an
-encryption handler to suit your parameters, explained below.
+加密服务提供双向对称（密钥）数据加密。该服务会根据你的参数实例化和/或初始化加密 **handler** （处理程序），具体说明如下。
 
-The handlers adapt our simple ``EncrypterInterface`` to use an
-appropriate PHP cryptographic extension or third party library.
-Such extensions may need to be explicitly enabled in your instance of PHP.
+加密服务的 handler 必须实现 CodeIgniter 的 ``EncrypterInterface`` 接口。
+使用适当的 PHP 加密扩展或第三方库可能需要在服务器上安装额外的软件，
+和/或需要在 PHP 实例中显式启用。
 
-The following extensions are currently supported:
+目前支持以下 PHP 扩展：
 
-- `OpenSSL <http://php.net/openssl>`_
+- `OpenSSL <https://www.php.net/manual/zh/book.openssl.php>`_
+- `Sodium <https://www.php.net/manual/zh/book.sodium>`_
 
-.. note:: Support for the ``MCrypt`` extension has been dropped, as that has
-    been deprecated as of PHP 7.2.
+这不是一个完整的加密解决方案。如需更多功能（如公钥加密），建议直接使用 OpenSSL 或其他 `加密扩展 <https://www.php.net/manual/zh/refs.crypto.php>`_。
+也可考虑使用更全面的包，如 `Halite <https://github.com/paragonie/halite>`_ （基于 libsodium 构建的面向对象包）。
+
+.. note:: 已放弃对 ``MCrypt`` 扩展的支持，因为该扩展自 PHP 7.2 起已被弃用。
 
 .. contents::
-  :local:
+    :local:
+    :depth: 3
 
-.. raw:: html
-
-  <div class="custom-index container"></div>
+.. _usage:
 
 ****************************
-Using the Encryption Library
+使用 Encryption 类
 ****************************
 
-Like all services in CodeIgniter, it can be loaded via ``Config\Services``::
+与 CodeIgniter 的所有服务一样，可通过 ``Config\Services`` 加载：
 
-    $encrypter = \Config\Services::encrypter();
+.. literalinclude:: encryption/001.php
 
-Default behavior
-================
+设置好起始密钥后（参见 :ref:`configuration`），加密和解密数据很简单——将适当的字符串传递给 ``encrypt()`` 和/或 ``decrypt()`` 方法：
 
-By default, the Encryption Library will use the OpenSSL handler, with
-the AES-256-CBC cipher, 
-using your configured *key* and SHA512 HMAC authentication.
+.. literalinclude:: encryption/002.php
 
-The *key* you provide is used for
-"keyed-hash message authentication" (HMAC), which derives
-two separate keys from your configured one: 
-one for encryption and one for authentication. This is
-done via a technique called `HMAC-based Key Derivation Function
-<http://en.wikipedia.org/wiki/HKDF>`_ (HKDF).
-
-Setting your encryption key
-===========================
-
-An *encryption key* is a piece of information that controls the
-cryptographic process and permits a plain-text string to be encrypted,
-and afterwards - decrypted. It is the secret "ingredient" in the whole
-process that allows you to be the only one who is able to decrypt data
-that you've decided to hide from the eyes of the public.
-After one key is used to encrypt data, that same key provides the **only**
-means to decrypt it, so not only must you chose one carefully, but you
-must not lose it or you will also lose access to the data.
-
-It must be noted that to ensure maximum security, such a key *should* not
-only be as strong as possible, but also often changed. Such behavior
-however is rarely practical or possible to implement, and that is why
-CodeIgniter gives you the ability to configure a single key that is to be
-used (almost) every time.
-
-It goes without saying that you should guard your key carefully. Should
-someone gain access to your key, the data will be easily decrypted. If
-your server is not totally under your control it's impossible to ensure
-key security so you may want to think carefully before using it for
-anything that requires high security, like storing credit card numbers.
-
-Your encryption key **must** be as long as the encryption algorithm in use
-allows. For AES-256, that's 256 bits or 32 bytes (characters) long.
-You will find a table below that shows the supported key lengths of
-different ciphers.
-
-The key should be as random as possible and it **must not** be a regular
-text string, nor the output of a hashing function, etc. In order to create
-a proper key, you can use the Encryption library's ``createKey()`` method
-::
-
-	// $key will be assigned a 32-byte (256-bit) random key
-	$key = Encryption::createKey(32);
-
-The key can be either stored in your *application/Config/Encryption.php*, or
-you can design your own storage mechanism and pass the key dynamically
-when encrypting/decrypting.
-
-To save your key to your *application/Config/Encryption.php*, open the file
-and set::
-
-	$key = 'YOUR KEY';
-
-You'll notice that the ``createKey()`` method outputs binary data, which
-is hard to deal with (i.e. a copy-paste may damage it), so you may use
-``bin2hex()``, ``hex2bin()`` or Base64-encoding to work with the key in
-a more friendly manner. For example::
-
-	// Get a hex-encoded representation of the key:
-	$encoded = bin2hex($encrypter->createKey(32));
-
-	// Put the same value in your config with hex2bin(),
-	// so that it is still passed as binary to the library:
-	$key = hex2bin(<your hex-encoded key>);
-
-.. _ciphers-and-modes:
-
-Encryption ciphers
-==================
-
-A *cipher* is a combination of an algorithm, key length, and encryption mode.
-For instance, "AES-256-CBC" refers to the AES algorithm using a 256 bit key and
-cipher block chaining (CBC) mode.
-
-Different encryption drivers support different sets of encryption algorithms and often implement
-them in different ways. Some algorithms expect specific key lengths, while others support
-variable length keys. Each algorithm usually supports several different encryption modes.
-
-Here's a list of common ciphers:
-
-======================== ============================ ===============================
-Algorithm name           Key lengths (bits / bytes)   Supported modes
-======================== ============================ ===============================
-AES-128 / Rijndael-128   128 / 16                     CBC, CTR, CFB, CFB8, OFB, ECB
-AES-192                  192 / 24                     CBC, CTR, CFB, CFB8, OFB, ECB
-AES-256                  256 / 32                     CBC, CTR, CFB, CFB8, OFB, ECB
-Blowfish                 128-448 / 16-56              CBC, CFB, OFB, ECB
-CAST5 / CAST-128         88-128 / 11-16               CBC, CFB, OFB, ECB
-DES                      56 / 7                       CBC, CFB, CFB8, OFB, ECB
-RC4 / ARCFour            40-2048 / 5-256              Stream
-TripleDES                56 / 7, 112 / 14, 168 / 21   CBC, CFB, CFB8, OFB
-======================== ============================ ===============================
-
-.. note:: Blowfish, CAST5 and RC4 support variable length keys, 
-        although in bit terms that only happens in 8-bit increments.
-
-        Even though CAST5 supports key lengths lower than 128 bits
-	(16 bytes), in fact they will just be zero-padded to the
-	maximum length, as specified in `RFC 2144
-	<http://tools.ietf.org/rfc/rfc2144.txt>`_.
-
-.. _encryption-modes:
-
-Encryption modes
-----------------
-
-Different modes of encryption have different characteristics and serve
-different purposes. Some are stronger than others, some are faster
-and some offer extra features.
-If you are unsure which to use, stick to the CBC mode - it is widely accepted 
-as strong and secure for general purposes.
-
-=========== =====================================================================
-Mode name   Additional info
-=========== =====================================================================
-CBC         Cipher block chaining - a safe default choice
-CFB         Cipher feedback
-CTR         Counter mode
-ECB         Electronic codebook - ignores IV (not recommended).
-OFB         Output feedback
-Stream      Not actually a mode, it just says that a stream cipher is being used.
-=========== =====================================================================
-
-OpenSSL Notes
--------------
-
-As noted above, the encryption drivers support different sets of encryption
-ciphers. The following examples are supported by OpenSSL:
-
-============== ============================== =========================================
-Cipher name    Key lengths (bits / bytes)     Supported modes
-============== ============================== =========================================
-AES-128        128 / 16                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
-AES-192        192 / 24                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
-AES-256        256 / 32                       CBC, CTR, CFB, CFB8, OFB, ECB, XTS
-Blowfish       128-448 / 16-56                CBC, CFB, OFB, ECB
-Camellia-128   128 / 16                       CBC, CFB, CFB8, OFB, ECB
-Camellia-192   192 / 24                       CBC, CFB, CFB8, OFB, ECB
-Camellia-256   256 / 32                       CBC, CFB, CFB8, OFB, ECB
-CAST5          88-128 / 11-16                 CBC, CFB, OFB, ECB
-DES            56 / 7                         CBC, CFB, CFB8, OFB, ECB
-RC2            8-1024 / 1-128                 CBC, CFB, OFB, ECB
-RC4            40-2048 / 5-256                Stream
-TripleDES      56 / 7, 112 / 14, 168 / 21     CBC, CFB, CFB8, OFB
-Seed           128 / 16                       CBC, CFB, OFB, ECB
-============== ============================== =========================================
-
-
-Message Length
-==============
-
-An encrypted string is usually
-longer than the original, plain-text string (depending on the cipher).
-
-This is influenced by the cipher algorithm itself, the initialization vector (IV) 
-prepended to the
-cipher-text and the HMAC authentication message that is also prepended.
-Furthermore, the encrypted message is also Base64-encoded so that it is safe
-for storage and transmission, regardless of a possible character set in use.
-
-Keep this information in mind when selecting your data storage mechanism.
-Cookies, for example, can only hold 4K of information.
+完成！Encryption 类会自动处理所有必要步骤，确保整个过程的加密安全性，开箱即用。
 
 .. _configuration:
 
-Configuring the library
+配置类
 =======================
 
-The Encryption library is designed to
-use repeatedly the same driver, encryption cipher and key.
+上述示例使用 **app/Config/Encryption.php** 中的配置设置。
 
-As noted in the "Default behavior" section above, this means using an
-auto-detected driver (OpenSSL has a higher priority), the AES-256 algorithm
-in CBC mode, and your ``$key`` value.
+============== ==========================================================================
+选项           可选值（括号内为默认值）
+============== ==========================================================================
+key            加密密钥起始值
+driver         首选 handler，如 OpenSSL 或 Sodium（``OpenSSL``）
+digest         消息摘要算法（``SHA512``）
+blockSize      [**SodiumHandler** 专用] 填充字节长度（``16``）
+cipher         [**OpenSSLHandler** 专用] 使用的加密算法（``AES-256-CTR``）
+encryptKeyInfo [**OpenSSLHandler** 专用] 加密密钥信息（``''``）
+authKeyInfo    [**OpenSSLHandler** 专用] 认证密钥信息（``''``）
+rawData        [**OpenSSLHandler** 专用] 密文是否为原始格式（``true``）
+============== ==========================================================================
 
-Encryption configuration settings are normally set in 
-application/config/Encryption.php.
-Not all settings are supported by all of the drivers
+可以通过向 ``Services`` 调用传递自定义配置对象来替换配置文件中的设置。``$config`` 变量必须是 ``Config\Encryption`` 类的实例。
 
-======== ===============================================
-Option   Possible values (default in parentheses)
-======== ===============================================
-driver   Preferred handler (OpenSSL)
-cipher   Cipher name (AES-256-CBC); see :ref:`ciphers-and-modes`)
-key      Encryption key starter
-digest   Which HMAC digest algorithm to use (SHA512)
-encoding The encoding to apply to encrypted results (base64)
-======== ===============================================
+.. literalinclude:: encryption/003.php
 
-You can over-ride any of those settings by passing your own ``Config`` object,
-or an associative array of parameters, or even just the driver name, to the Services::
+.. _encryption-compatible-with-ci3:
 
-    $encrypter = \Config\Services::encrypter($params);
+与 CI3 保持兼容的配置
+------------------------------------------------
 
-These will replace any same-named settings in ``Config\Encryption``.
+.. versionadded:: 4.3.0
 
-.. _digests:
+自 v4.3.0 起，可以解密使用 CI3 加密的数据。如需解密此类数据，请使用以下设置以保持兼容。
 
-Supported HMAC authentication algorithms
+.. literalinclude:: encryption/013.php
+
+支持的 HMAC 认证算法
 ----------------------------------------
 
-For HMAC message authentication, the Encryption library supports
-usage of the SHA-2 family of algorithms:
+对于 HMAC 消息认证，Encryption 类支持使用 SHA-2 系列算法：
 
 =========== ==================== ============================
-Algorithm   Raw length (bytes)   Hex-encoded length (bytes)
+算法        原始长度（字节）     十六进制编码长度（字节）
 =========== ==================== ============================
-sha512      64                   128
-sha384      48                   96
-sha256      32                   64
-sha224      28                   56
+SHA512      64                   128
+SHA384      48                   96
+SHA256      32                   64
+SHA224      28                   56
 =========== ==================== ============================
 
-Using the Encryption manager directly
+不包含 MD5 或 SHA1 等其他流行算法的原因是它们已不再被视为足够安全，因此不鼓励使用。
+如果确实需要使用，可通过 PHP 原生的 `hash_hmac() <https://www.php.net/manual/zh/function.hash-hmac.php>`_ 函数轻松实现。
+
+当然，随着更安全算法的出现和普及，未来会添加更多的算法支持。
+
+默认行为
+================
+
+默认情况下，Encryption 类使用 OpenSSL handler。该 handler 使用 AES-256-CTR 算法、你配置的 *key* 和 SHA512 HMAC 认证进行加密。
+
+设置加密密钥
+===========================
+
+加密密钥 **必须** 与所用加密算法允许的长度一致。对于 AES-256，即 256 位或 32 字节（字符）长。
+
+密钥应尽可能随机，**绝不能** 是普通文本字符串，也不能是哈希函数的输出等。要创建合适的密钥，可使用 Encryption 类的 ``createKey()`` 方法。
+
+.. literalinclude:: encryption/004.php
+
+密钥可以存储在 **app/Config/Encryption.php** 中，也可以设计自己的存储机制，在加密/解密时动态传递密钥。
+
+要将密钥保存到 **app/Config/Encryption.php**，打开文件并设置：
+
+.. literalinclude:: encryption/005.php
+
+编码密钥或结果
+------------------------
+
+``createKey()`` 方法输出的是二进制数据，难以处理（例如复制粘贴可能会损坏），因此可以使用 ``bin2hex()`` 或 ``base64_encode`` 以更易用的方式处理密钥。例如：
+
+.. literalinclude:: encryption/006.php
+
+同样的技巧也适用于加密结果：
+
+.. literalinclude:: encryption/007.php
+
+使用前缀存储密钥
+------------------------------
+
+存储加密密钥时可以使用两个特殊前缀：``hex2bin:`` 和 ``base64:``。当这些前缀紧接在密钥值之前时，``Encryption`` 会智能解析密钥，并仍将二进制字符串传递给库。
+
+.. literalinclude:: encryption/008.php
+
+同样，也可以在 **.env** 文件中使用这些前缀！
+::
+
+    // 用于 hex2bin
+    encryption.key = hex2bin:<your-hex-encoded-key>
+
+    // 或
+    encryption.key = base64:<your-base64-encoded-key>
+
+加密密钥轮换
+=======================
+
+.. versionadded:: 4.7.0
+
+基于安全最佳实践或合规要求需轮换加密密钥时，可利用 ``previousKeys`` 配置项。这能在新加密操作使用新密钥的同时，确保仍可解密旧密钥加密的数据。
+
+工作原理
+------------
+
+- **加密** 始终使用当前的 ``key`` 值
+- **解密** 首先尝试当前的 ``key``
+- 解密失败时，程序会自动回退并逐一尝试 ``previousKeys`` 中的密钥
+- 由此可实现无缝密钥轮换，避免数据丢失
+
+配置
+-------------
+
+将旧密钥添加到 **app/Config/Encryption.php** 的 ``$previousKeys`` 属性中：
+
+.. literalinclude:: encryption/014.php
+
+使用 .env 文件
+---------------
+
+亦可在 **.env** 文件（推荐做法）中使用逗号分隔的列表配置旧密钥：
+
+::
+
+    encryption.key = hex2bin:your_new_key
+    encryption.previousKeys = hex2bin:old_key_1,hex2bin:old_key_2
+
+框架会自动将逗号分隔的字符串解析为数组并处理每个密钥。
+
+密钥轮换流程
+---------------------
+
+1. **轮换前**：使用 ``key`` 加密和解密数据。
+2. **开始轮换**：将当前 ``key`` 值移入 ``previousKeys`` 数组，并为 ``key`` 设置新值。
+3. **轮换期间**：新数据由新 ``key`` 加密，旧数据仍可通过 ``previousKeys`` 解密。
+4. **重新加密数据（可选）**：使用新密钥解密并重新加密现有数据。
+5. **完成轮换**：所有数据重新加密后，从 ``previousKeys`` 中移除旧密钥。
+
+.. important:: ``previousKeys`` 特性仅用于 **解密回退**。所有新加密操作始终使用当前的 ``key``。若通过 ``encrypt()`` 或 ``decrypt()`` 的 ``$params`` 参数传递了显式密钥，则不会触发 ``previousKeys`` 回退机制。
+
+填充
+=======
+
+有时，消息长度本身可能泄露很多关于其性质的信息。如果消息是"yes"、"no"和"maybe"之一，加密消息并无帮助：知道长度就足以判断消息内容。
+
+填充是一种缓解此问题的技术，通过将长度变为给定块大小的倍数来实现。
+
+``SodiumHandler`` 使用 libsodium 原生的 ``sodium_pad`` 和 ``sodium_unpad`` 函数实现填充。这需要在加密前将填充长度（以字节为单位）添加到明文消息，解密后移除。填充可通过 ``Config\Encryption`` 的 ``$blockSize`` 属性配置。该值应大于零。
+
+.. important:: 不建议自行设计填充实现。应始终使用库提供的更安全实现。此外，密码不应进行填充。
+    不推荐通过填充来隐藏密码长度。客户端向服务器发送密码时应先进行哈希处理（即使只对哈希函数进行一次迭代）。
+    这确保传输数据长度恒定，且服务器不会轻松获得密码副本。
+
+加密处理程序说明
+========================
+
+OpenSSL 说明
+-------------
+
+`OpenSSL <https://www.php.net/manual/zh/book.openssl.php>`_ 扩展长期以来一直是 PHP 的标准组成部分。
+
+CodeIgniter 的 OpenSSL handler 使用 AES-256-CTR 加密算法。
+
+配置提供的 *key* 用于派生另外两个密钥：一个用于加密，一个用于认证。这是通过 `基于 HMAC 的密钥派生函数 <https://en.wikipedia.org/wiki/HKDF>`_ （HKDF）技术实现的。
+
+Sodium 说明
+------------
+
+`Sodium <https://www.php.net/manual/zh/book.sodium>`_ 扩展自 PHP 7.2.0 起默认捆绑在 PHP 中。
+
+Sodium 使用 XSalsa20 算法加密、Poly1305 进行 MAC 认证、XS25519 进行密钥交换，用于端到端场景中的秘密消息传输。要使用共享密钥（如对称加密）加密和/或认证字符串，Sodium 使用 XSalsa20 算法加密，HMAC-SHA512 进行认证。
+
+消息长度
+==============
+
+加密后的字符串通常比原始明文字符串更长（取决于加密算法）。
+
+这受加密算法本身、添加到密文前部的初始化向量（IV）以及添加的 HMAC 认证消息的影响。此外，加密消息还会进行 Base64 编码，以便无论使用何种字符集都能安全存储和传输。
+
+选择数据存储机制时请考虑此信息。例如，Cookie 只能容纳 4K 信息。
+
+直接使用加密服务
 =====================================
 
-Instead of, or in addition to, using the `Services` described
-at the beginning of this page, you can use the encryption manager
-directly, to create an ``Encrypter`` or to change the settings
-of the current one.
+除了（或作为替代）使用 :ref:`usage` 中描述的 ``Services`` 外，还可以直接创建"Encrypter"，或更改现有实例的设置。
 
-    $encryption = new \Encryption\Encryption();
-    $encrypter = $encryption->initialize($params);
+.. literalinclude:: encryption/009.php
 
-For example, if you were to change the encryption algorithm and
-mode to AES-256 in CTR mode, this is what you should do::
-
-    $encryption = new \Encryption\Encryption();
-    $encrypter = $encryption->initialize([
-            'cipher' => 'aes-256-ctr',
-            'key' => '<a 32-character random string>'		
-	]);
-
-Note that we only mentioned that you want to change the cipher,
-but we also included a key in the example. As previously noted, it is
-important that you choose a key with a proper size for the used algorithm.
-
-If you want to change the driver, for instance switching between
-Sodium and OpenSSL, you could go through the Services::
-
-	// Switch to the Sodium driver
-	$encrypter= \Config\Services::encrypter(['driver' => 'Sodium']);;
-        // encrypt data using Sodium
-
-	// Switch back to the OpenSSL driver
-	$encrypter= \Config\Services::encrypter(['driver' => 'OpenSSL']);;
-        // now encrypt data using OpenSSL
-
-Alternately, you could use the encryption manager directly:
-
-    $encryption = new \Encryption\Encryption();
-
-    // Switch to the Sodium driver
-    $encrypter= $encryption->initialize(['driver' => 'Sodium']);;
-    // encrypt data using Sodium
-
-    // Switch back to the OpenSSL driver
-    $encrypter= $encryption->initialize(['driver' => 'OpenSSL']);;
-    // now encrypt data using OpenSSL
-
-
-Note that it would be easier to save these separately, if both encrypters
-were to be needed as part of handling the same request.
-
-    $encryption = new \Encryption\Encryption();
-    $encrypter1 = $encryption->initialize(['driver' => 'Sodium']);;
-    $encrypter2 = $encryption->initialize(['driver' => 'OpenSSL']);;
-
-Encrypting and decrypting data
-==============================
-
-Encrypting and decrypting data with the already configured library
-settings is simple - pass the appropriate string to the
-``encrypt()`` and/or ``decrypt()`` methods::
-
-	$plain_text = 'This is a plain-text message!';
-	$ciphertext = $encrypter->encrypt($plaintext);
-
-	// Outputs: This is a plain-text message!
-	echo $encrypter->decrypt($ciphertext);
-
-And that's it! The Encryption library will do everything necessary
-for the whole process to be cryptographically secure out-of-the-box.
-You don't need to worry about it.
-
-.. important:: Both methods will return FALSE in case of an error.
-	While for ``encrypt()`` this can only mean incorrect
-	configuration, you should always check the return value
-	of ``decrypt()`` in production code.
-
-
-.. _custom-parameters:
-
+记住，``$config`` 必须是 ``Config\Encryption`` 类的实例。
 
 ***************
-Class Reference
+类参考
 ***************
 
-.. php:class:: CodeIgniter\\Encryption\\Encryption
+.. php:namespace:: CodeIgniter\Encryption
 
-	.. php:staticmethod:: createKey($length)
+.. php:class:: Encryption
 
-		:param	int	$length: Output length
-		:returns:	A pseudo-random cryptographic key with the specified length, or FALSE on failure
-		:rtype:	string
+    .. php:staticmethod:: createKey([$length = 32])
 
-		Creates a cryptographic key by fetching random data from
-		the operating system's sources (i.e. /dev/urandom).
+        :param int $length: 输出长度
+        :returns: 指定长度的伪随机加密密钥，失败时返回 ``false``
+        :rtype:    string
 
+        通过从操作系统源（*即* ``/dev/urandom``）获取随机数据创建加密密钥。
 
-	.. php:method:: initialize($params)
+    .. php:method:: initialize([Encryption $config = null])
 
-		:param	array	$params: Configuration parameters
-		:returns:	CodeIgniter\\Encryption\\EncrypterInterface instance (for method chaining)
-		:rtype:	CodeIgniter\\Encryption\\EncrypterInterface
-		:throws:	CodeIgniter\\Encryption\\EncryptionException
+        :param Config\\Encryption $config: 配置参数
+        :returns: ``CodeIgniter\Encryption\EncrypterInterface`` 实例
+        :rtype:    ``CodeIgniter\Encryption\EncrypterInterface``
+        :throws: ``CodeIgniter\Encryption\Exceptions\EncryptionException``
 
-		Initializes (configures) the library to use different settings.
+        初始化（配置）库以使用不同的设置。
 
-		Example::
+        示例：
 
-			$encrypter = $encryption->initialize(['cipher' => '3des']);
+        .. literalinclude:: encryption/010.php
 
-		Please refer to the :ref:`configuration` section for detailed info.
+        详细信息请参见 :ref:`configuration` 部分。
 
-.. php:interface:: CodeIgniter\\Encryption\\EncrypterInterface
+.. php:interface:: CodeIgniter\Encryption\EncrypterInterface
 
-	.. php:method:: encrypt($data)
+    .. php:method:: encrypt($data[, $params = null])
 
-		:param	string	$data: Data to encrypt
-		:returns:	Encrypted data or FALSE on failure
-		:rtype:	string
+        :param string $data: 要加密的数据
+        :param array|string|null $params: 配置参数（密钥）
+        :returns: 加密后的数据
+        :rtype:    string
+        :throws: ``CodeIgniter\Encryption\Exceptions\EncryptionException``
 
-		Encrypts the input data and returns its ciphertext.
+        加密输入数据并返回密文。
 
-		Example::
+        如果将参数作为第二个参数传递，当 ``$params`` 为数组时，``key`` 元素将用作本次操作的起始密钥；或者可以将起始密钥作为字符串传递。
 
-			$ciphertext = $encrypter->encrypt('My secret message');
+        如果使用 SodiumHandler 并希望在运行时传递不同的 ``blockSize``，请在 ``$params`` 数组中传递 ``blockSize`` 键。
 
-	.. php:method:: decrypt($data)
+        示例：
 
-		:param	string	$data: Data to decrypt
-		:returns:	Decrypted data or FALSE on failure
-		:rtype:	string
-		:throws:	CodeIgniter\\Encryption\\EncryptionException
+        .. literalinclude:: encryption/011.php
 
-		Decrypts the input data and returns it in plain-text.
+    .. php:method:: decrypt($data[, $params = null])
 
-		Example::
+        :param string $data: 要解密的数据
+        :param array|string|null $params: 配置参数（密钥）
+        :returns: 解密后的数据
+        :rtype:    string
+        :throws: ``CodeIgniter\Encryption\Exceptions\EncryptionException``
 
-			echo $encrypter->decrypt($ciphertext);
+        解密输入数据并以明文返回。
+
+        如果将参数作为第二个参数传递，当 ``$params`` 为数组时，``key`` 元素将用作本次操作的起始密钥；或者可以将起始密钥作为字符串传递。
+
+        如果使用 SodiumHandler 并希望在运行时传递不同的 ``blockSize``，请在 ``$params`` 数组中传递 ``blockSize`` 键。
+
+        示例：
+
+        .. literalinclude:: encryption/012.php

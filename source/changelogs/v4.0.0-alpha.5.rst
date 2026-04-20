@@ -1,0 +1,273 @@
+版本 4.0.0-alpha.5
+=====================
+
+发布日期：2019 年 1 月 30 日
+
+**CodeIgniter4 的下一个内测版本**
+
+.. contents::
+    :local:
+    :depth: 2
+
+亮点
+----------
+
+- 在 app/Config/Toolbar.php 中添加了 $maxQueries 设置
+- 将 PHP 依赖更新到 7.2
+- 为电子邮件和队列模块创建了新的功能分支,以便它们不影响 4.0.0 的发布
+- 删除了几条未使用的语言消息(如 Migrations.missingTable),并添加了一些新消息(如 Migrations.invalidType)
+- 修复了大量 Bug,尤其是数据库支持
+- 提供的过滤器(CSRF、Honeypot、DebugToolbar)已从 app/Filters/ 移动到 system/Filters/
+- 重新审视了用户指南的安装和教程部分
+- 代码覆盖率达到 77% ... 我们的目标 80% 越来越近了 :)
+
+我们希望这将是最后一个内测版本,下一个预发布版本将是我们的第一个测试版...祝我们好运!
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+    - starter/
+        - README.md #1637
+        - app/Config/Paths.php #1685
+    - release-appstarter #1685
+
+- app/
+    - Config/
+        - Filters #1686
+        - Modules #1665
+        - Services #614216
+            - Toolbar
+
+- contributing/
+    - guidelines.rst #1671, #1673
+    - internals.rst #1671
+
+- public/
+    - index.php #1648, #1670
+
+- system/
+    - Autoloader/
+        - Autoloader #1665, #1672
+        - FileLocator #1665
+    - Commands/
+        - Database/MigrationRollback #1683
+    - Config/
+        - BaseConfig #1635
+        - BaseService #1635, #1665
+        - Paths #1626
+        - Services #614216, #3a4ade, #1643
+        - View #1616
+    - Database/
+        - BaseBuilder #1640, #1663, #1677
+        - BaseConnection #1677
+        - Config #6b8b8b, #1660
+        - MigrationRunner #81d371, #1660
+        - Query #1677
+    - Database/Postgre/
+        - Builder #d2b377
+    - Debug/Toolbar/Collectors/
+        - Logs #1654
+        - Views #3a4ade
+    - Events/
+        - Events #1635
+    - Exceptions/
+        - ConfigException #1660
+    - Files/
+        - Exceptions/FileException #1636
+        - File #1636
+    - Filters/
+        - Filters #1635, #1625, #6dab8f
+        - CSRF #1686
+        - DebugToolbar #1686
+        - Honeypot #1686
+    - Helpers/
+        - form_helper #1633
+        - html_helper #1538
+        - xml_helper #1641
+    - HTTP/
+        - ContentSecurityPolicy #1641, #1642
+        - URI #2e698a
+    - Language/
+        - /en/Files #1636
+        - Language #1641
+    - Log/
+        - Handlers/FileHandler #1641
+    - Router/
+        - RouteCollection #1665, #5951c3
+        - Router #9e435c, #7993a7, #1678
+    - Session/
+        - Handlers/BaseHandler #1684
+        - Handlers/FileHandler #1684
+        - Handlers/MemcachedHandler #1679
+        - Session #1679
+    - bootstrap #81d371, #1665
+    - Common #1660
+    - Entity #1623, #1622
+    - Model #1617, #1632, #1656, #1689
+
+- tests/
+    - README.md #1671
+
+- tests/system/
+    - API/
+        - ResponseTraitTest #1635
+    - Autoloader/
+        - AutoloaderTest #1665
+        - FileLocatorTest #1665, #1686
+    - CLI/
+        - CommandRunnerTest #1635
+        - CommandsTest #1635
+    - Config/
+        - BaseConfigTest #1635
+        - ConfigTest #1643
+        - ServicesTest #1635, #1643
+    - Database/Builder/
+        - AliasTest #bea1dd
+        - DeleteTest #1677
+        - GroupTest #1640
+        - InsertTest #1640, #1677
+        - LikeTest #1640, #1677
+        - SelectTest #1663
+        - UpdateTest #1640, #1677
+        - WhereTest #1640, #1677
+    - Database/Live/
+        - AliasTest #1675
+        - ConnectTest #1660, #1675
+        - ForgeTest #6b8b8b
+        - InsertTest #1677
+        - Migrations/MigrationRunnerTest #1660, #1675
+        - ModelTest #1617, #1689
+    - Events/
+        - EventTest #1635
+    - Filters/
+        - CSRFTest #1686
+        - DebugToolbarTest #1686
+        - FiltersTest #1635, #6dab8f, #1686
+        - HoneypotTest #1686
+    - Helpers/
+        - FormHelperTest #1633
+        - XMLHelperTest #1641
+    - Honeypot/
+        - HoneypotTest #1686
+    - HTTP/
+        - ContentSecurityPolicyTest #1641
+        - IncomingRequestTest #1641
+    - Language/
+        - LanguageTest #1643
+    - Router/
+        - RouteCollectionTest #5951c3
+        - RouterTest #9e435c
+    - Validation/
+        - RulesTest #1689
+    - View/
+        - ParserPluginTest #1669
+        - ParserTest #1669
+
+- user_guide_src/
+
+    - concepts/
+        - autoloader #1665
+        - structure #1648
+    - database/
+        - connecting #1660
+        - transactions #1645
+    - general/
+        - configuration #1643
+        - managing_apps #5f305a, #1648
+        - modules #1613, #1665
+    - helpers/
+        - form_helper #1633
+    - incoming/
+        - filters #1686
+        - index #4a1886
+        - methodspoofing #4a1886
+    - installation/
+        - index #1690, #1693
+        - installing_composer #1673, #1690
+        - installing_git #1673, #1690
+        - installing_manual #1673, #1690
+        - repositories #1673, #1690
+        - running #1690, #1691
+        - troubleshooting #1690, #1693
+    - libraries/
+        - honeypot #1686
+        - index #1643, #1690
+        - throttler #1686
+    - tutorial/
+        - create_news_item  #1693
+        - index #1693
+        - news_section #1693
+        - static_pages #1693
+
+- composer.json #1670
+- contributing.md #1670
+- README.md #1670
+- spark #1648
+- .travis.yml #1649, #1670
+
+合并的 PR
+----------
+
+- #1693 文档/教程
+- #5951c3 允许域/子域重写现有路由
+- #1691 更新运行文档
+- #1690 重写安装文档
+- #bea1dd AliasTests 的补充,用于潜在的 LeftJoin 问题
+- #1689 Model 验证修复
+- #1687 为过滤器添加版权声明
+- #1686 重构/过滤器
+- #1685 修复管理员 - 应用启动器创建
+- #1684 为 filehandler 更新会话 id 清理
+- #1683 修复 migrate:refresh 错误
+- #d2b377 修复 Postgres replace 命令以适应新的绑定存储方式
+- #4a1886 文档方法欺骗
+- #2e698a 也 urldecode URI 键和值。
+- #1679 save_path - 用于 memcached
+- #1678 修复路由未替换正斜杠
+- #1677 为数据库引擎实现不转义功能
+- #1675 添加缺失的测试组指令
+- #1674 更新变更日志
+- #1673 更新下载和安装文档
+- #1672 更新 Autoloader.php
+- #1670 将 PHP 依赖更新到 7.2
+- #1671 更新文档
+- #1669 增强 Parser 和插件测试
+- #1665 Composer PSR4 命名空间现在是模块自动发现的一部分
+- #6dab8f 过滤器不区分大小写匹配
+- #1663 修复 whereIn 使用时的绑定问题
+- #1660 迁移测试和数据库调整
+- #1656 __get() 中的 DBGroup,允许在模型外验证“数据库”数据
+- #1654 工具栏 - 返回 Logger::$logCache 项
+- #1649 在 travis 配置中将 php 7.3 从 "allow_failures" 中删除
+- #1648 更新“管理应用”文档
+- #1645 修复启用事务时令人困惑的地方(文档)
+- #1643 移除电子邮件模块
+- #1642 CSP nonce 属性值为 ""
+- #81d371 自动加载和迁移期间对配置文件进行安全检查
+- #1641 更多单元测试调整
+- #1640 在 BaseBuilder 中更新 getCompiledX 方法
+- #1637 修复启动器自述文件
+- #1636 重构 Files 模块
+- #5f305a UG - 管理应用中的拼写错误
+- #1635 单元测试增强
+- #1633 使用 csrf_field 和 form_hidden
+- #1632 应该将 DBGroup 传递给 ->run 而不是 ->setRules
+- #1631 在 UploadedFile 类中许可证文档之后移动 use 语句
+- #1630 版权更新到 2019
+- #1629 将 "application" 目录文档和注释改为 "app"
+- #3a4ade view() 现在可以再次适当读取应用配置
+- #7993a7 使 translateURIDashes 正常工作的最终部分
+- #9e435c 修复 translateURIDashes
+- #1626 清理 Paths::$viewDirectory 属性
+- #1625 匹配后不是设置为空
+- #1623 如果定义为可空,则不转换属性
+- #1622 __set 的可空支持
+- #1617 countAllResults() 应该遵守软删除
+- #1616 修复 View 配置合并顺序
+- #614216 将 honeypot 服务从应用 Services 文件移到它所属的系统 Services
+- #6b8b8b 允许 db forge 和工具接受连接信息数组而不是组名
+- #1613 文档中的拼写错误
+- #1538 img 修复(?)- html_helper

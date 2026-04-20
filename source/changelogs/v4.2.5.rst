@@ -1,0 +1,29 @@
+版本 4.2.5
+#############
+
+发布日期：2022 年 8 月 28 日
+
+**CodeIgniter4 的 4.2.5 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+不兼容变更
+**********
+
+- ``BaseConnection::tableExists()`` 的方法签名已更改。添加了第二个可选参数 ``$cached``。这指示是否使用缓存数据。默认为 ``true``,使用缓存数据。
+- ``BaseBuilder::_listTables()`` 的抽象方法签名已更改。添加了第二个可选参数 ``$tableName``。提供表名将只生成该表的 SQL 列表。
+- ``Validation::processRules()`` 和 ``Validation::getErrorMessage()`` 的方法签名已更改。这两个方法都添加了新的 ``$originalField`` 参数。
+
+增强功能
+************
+
+- 将 Kint 更新到 4.2.0。
+
+Bug 修复
+**********
+- 在主查询中使用子查询时,会向表别名添加前缀。
+
+有关完整的 Bug 修复列表，请参阅仓库的
+`CHANGELOG_4.2.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/changelogs/CHANGELOG_4.2.md>`_。

@@ -1,0 +1,207 @@
+版本 4.0.0-beta.4
+====================
+
+发布日期：2019 年 7 月 25 日
+
+.. contents::
+    :local:
+    :depth: 2
+
+亮点
+----------
+
+有一些破坏性变更...
+
+- Entity 类已被重构;
+- Model 类的变更已更新,以更好地处理软删除
+- 路由已经加强
+
+新消息
+------------
+
+- 新的翻译键:Database/noDateFormat
+
+应用变更
+-----------
+
+测试变更
+---------------
+
+- 在 tests/_support 中增强了数据库和迁移测试
+
+变更的文件
+-------------
+
+变更文件的列表如下,带有 PR 编号:
+
+- admin/
+
+- app/
+    - Controllers/
+        - Home #1999
+
+- public/
+
+- system/
+    - Autoloader/
+        - FileLocator #2059, #2064
+    - Cache/
+        - CacheFactory #2060
+        - Handlers/
+            - MemcachedHandler #2060
+            - PredisHandler #2060
+            - RedisHandler #2060
+    - Commands/
+        - Utilities/Routes #2008
+    - Config/
+        - Config #2079
+        - Services #2024
+    - Database/
+        - MySQLi/
+            - Connection #2042
+            - Result #2011
+        - Postgre/
+            - Connection #2042
+            - Result #2011
+        - SQLite3/
+            - Connection #2042
+            - Forge #2042
+            - Result #2011
+            - Table #2042
+        - BaseBuilder #1989
+        - BaseConnection #2042
+        - BaseResult #2002
+        - Forge #2042
+        - MigratiopnRollback #2035
+        - MigrationRunner #2019
+    - Debug/
+        - Toolbar/Collectors/Routes #2030
+    - Exceptions.
+        - ModelException #2054
+    - Files/
+        - File #2104
+    - Filters/
+        - Filters #2039
+    - helpers/
+        - date_helper #2091
+    - HTTP/
+        - CLIRequest #2024
+        - CURLRequest #1996, #2050
+        - IncomingRequest #2063
+        - Request #2024
+    - Language/en/
+        - Database #2054
+    - Pager/
+        - Pager #2026
+    - Router/
+        - RouteCollection #1959, #2012, #2024
+        - Router #2024, #2031, #2043
+        - RouterInterface #2024
+    - Session/
+        - Handlers/ArrayHandler #2014
+    - Test/
+        - CIUnitTestCase #2002
+        - FeatureTestCase #2043
+    - Throttle/
+        - Throttler #2074
+    - CodeIgniter #2012, #2024
+    - Common #2036
+    - Entity #2002, #2004, #2011, #2081
+    - Model #2050, #2051, #2053, #2054
+
+- tests/system/
+    - CLI/
+        - ConsoleTest #2024
+    - Database/
+        - Live/
+            - DbUtilsTest #2051, #2053
+            - ForgeTest #2019, #2042
+            - ModelTest #2002, #2051, #2053, #2054
+            - SQLite/AlterTablesTest #2042
+            - WhereTest #2052
+        - Migrations/MigrationRunnerTest #2019
+    - HTTP/
+        - CLIRequest #2024
+        - CURLRequestTest #1996
+    - Router/
+        - RouteCollectionTest #1959, #2012, #2024
+        - RouterTest #2024, #2043
+    - Test/
+        - FeatureTestCaseTest #2043
+    - Throttle/
+        - ThrottleTest #2074
+    - View/
+        - ParserTest #2005
+    - CodeIgniterTest #2024
+    - EntityTest #2002, #2004
+
+- user_guide_src/
+    - concepts/
+        - autoloader #2035, #2071
+    - database/
+        - query_builder #2035
+    - dbmgmt/
+        - forge #2042
+        - migration #2042
+    - helpers/
+        - date_helper #2091
+    - incoming/
+        - routing #2035
+    - installation/
+        - installing_composer #2015, #2035
+    - libraries/
+        - pagination #2026
+        - sessions #2014, #2035
+        - validaiton #2069
+        - uploaded_files #2104
+    - models/
+        - entitites #2002, #2004, #2035
+        - model #2051, #2053, #2054
+    - outgoing/
+        - view_parser #e21823, 32005
+    - testing/
+        - database #2051, #2053
+
+合并的 PR
+----------
+
+- #2104 文件和上传文件修复
+- #2091 时区选择
+- #2081 改进 JSON 格式检查
+- #2079 更新 config() 以检查所有命名空间
+- #2074 Throttler 可以访问桶的生命周期
+- #2071 修复 autoloader.rst 格式
+- #2069 验证规则:then -> than(拼写)
+- #2064 修复文件定位器斜杠错误的 Bug
+- #2063 确保查询变量是 request->uri 的一部分。修复 #2062
+- #2060 缓存驱动备份
+- #2059 为 `locateFile()` 添加多路径支持
+- #2054 为缺失/无效的 dateFormat 添加模型异常
+- #2053 将 Model 的 deleted 标志更改为 deleted_at 日期时间/时间戳。修复 #2041
+- #2052 为 (not) null 添加各种测试
+- #2051 软删除使用 deleted_at
+- #2050 在触发事件之前保存插入 ID
+- #2043 路由时应传入零参数。修复 #2032
+- #2042 SQLite3 现在支持删除外键。修复 #1982
+- #2040 更新 CURLRequest.php
+- #2039 限制 URI 的过滤器匹配,使其需要精确匹配。修复 #2038
+- #2036 使 `force_https()` 在退出之前发送标头
+- #2035 各种拼写错误和指南更正
+- #2031 回退到服务器请求以获取默认方法
+- #2030 在调试工具栏中支持新的 `router` 服务
+- #2026 扩展 Pager::makeLinks(可选组名)
+- #2024 重构 router 和 route collection 确定当前 HTTP 动词的方式
+- #2019 SQLite 和 Mysql 驱动的附加测试以及迁移运行程序测试修复
+- #2015 安装后直接用户遵循升级步骤
+- #2014 添加了一个新的 Session/ArrayHandler,可在测试期间使用
+- #2012 对 HTTP 动词使用 request->method
+- #2011 为实体设置没有任何变异的原始数据数组
+- #2008 为命令 "routes" 添加 `patch` 方法
+- #2005 插件闭包文档更新和测试
+- #2004 允许不带参数调用 hasChanged()
+- #2002 实体重构
+- #1999 使用 CodeIgniter\Controller; 不需要因为 Home 控制器扩展...
+- #1996 尝试修复 CURLRequest 调试问题。#1994
+- #e21823 修正了解析器插件的文档。关闭 #1995
+- #1989 参数 set() 必须是字符串类型 - 无法同意
+- #1959 防止 reverseRoute 搜索闭包

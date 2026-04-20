@@ -1,18 +1,9 @@
-#######
-Credits
-#######
+########
+贡献致谢
+########
 
-CodeIgniter was originally developed by `EllisLab  <https://ellislab.com/>`_. 
-The framework was written for performance in the real world, 
-with many of the original class libraries, helpers, and
-sub-systems borrowed from the code-base of `ExpressionEngine
-<https://ellislab.com/expressionengine>`_. 
-It was, for years, developed and maintained by EllisLab, the ExpressionEngine
-Development Team and a group of community members called the Reactor Team.
+CodeIgniter 最初由 `EllisLab <https://ellislab.com/>`_ 开发。该框架专为现实环境中的高性能而设计，其许多原始类库、辅助函数和子系统都借鉴了 `ExpressionEngine <https://expressionengine.com>`_ 的代码库。多年来，它一直由 EllisLab、ExpressionEngine 开发团队以及名为 Reactor Team 的社区成员小组共同开发和维护。
 
-In 2014, CodeIgniter was acquired by the `British Columbia Institute of Technology
-<http://www.bcit.ca/>`_ and was then officially announced as a community-maintained
-project.
+2014 年，CodeIgniter 被 `不列颠哥伦比亚理工学院 <https://www.bcit.ca/>`_ 收购，随后正式宣布转变为一个社区维护的项目。
 
-Bleeding edge development is spearheaded by the handpicked contributors
-of the CodeIgniter Council.
+2019 年，CodeIgniter 基金会成立，旨在提供一个独立于任何其他实体的永久性管理组织，以确保持续推动框架的未来发展。

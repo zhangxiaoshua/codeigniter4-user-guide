@@ -1,0 +1,23 @@
+版本 4.3.1
+#############
+
+发布日期：2023 年 1 月 14 日
+
+**CodeIgniter4 的 4.3.1 版本发布**
+
+.. contents::
+    :local:
+    :depth: 3
+
+Bug 修复
+**********
+
+* 修复:某些环境变量(**.env**)的值没有反映在电子邮件配置中
+* 修复:验证 ``is_unique`` 和 ``is_not_unique`` 中的 TypeError
+* 修复:意外更改了方法名 ``BaseBuilder::resetQuery()``
+* 修复:验证严格规则中处理浮点数 (``greater_than``、``greater_than_equal_to``、``less_than``、``less_than_equal_to``)
+* 修复:用户指南中缺少 PHP 8.2 中 ``Config\Exceptions`` 的说明
+
+请查看仓库的
+`CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_
+以获取完整的 Bug 修复列表。

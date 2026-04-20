@@ -1,28 +1,26 @@
 ###############
-Database Events
+数据库事件
 ###############
 
-The Database classes contain a few :doc:`Events </general/events>` that you can tap into in
-order to learn more about what is happening during the database execution. These events can
-be used to collect data for analysis and reporting. The :doc:`Debug Toolbar </general/debugging>`
-uses this to collect the queries to display in the Toolbar.
+数据库类包含一些 :doc:`事件 </extending/events>`，你可以利用这些事件来了解数据库执行过程中的详细情况。这些事件可用于收集数据分析和生成报告。:doc:`调试工具栏 </testing/debugging>` 就是利用这些事件来收集查询信息并显示在工具栏中。
 
-==========
-The Events
-==========
+.. contents::
+    :local:
+    :depth: 2
 
-**DBQuery**
+**********
+事件
+**********
 
-This event is triggered whenever a new query has been run, whether successful or not. The only parameter is
-a :doc:`Query </database/queries>` instance of the current query. You could use this to display all queries
-in STDOUT, or logging to a file, or even creating tools to do automatic query analysis to help you spot
-potentially missing indexes, slow queries, etc. An example usage might be::
+.. _database-events-dbquery:
 
-    // In Config\Events.php
-    Events::on('DBQuery', 'CodeIgniter\Debug\Toolbar\Collectors\Database::collect');
+DBQuery
+=======
 
-    // Collect the queries so something can be done with them later.
-    public static function collect(CodeIgniter\Database\Query $query)
-    {
-        static::$queries[] = $query;
-    }
+每当执行一个新查询（无论成功与否）时，都会触发此事件。该事件唯一的参数是当前查询的 :doc:`Query </database/queries>` 实例。
+
+你可以利用此事件将所有查询输出到 STDOUT，或记录到文件中，甚至创建工具进行自动查询分析，以帮助你发现可能缺少的索引、慢查询等问题。
+
+记录所有查询的示例：
+
+.. literalinclude:: events/001.php

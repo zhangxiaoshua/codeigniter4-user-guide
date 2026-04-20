@@ -1,27 +1,21 @@
-##################
-Database Reference
-##################
+######################
+数据库操作
+######################
 
-CodeIgniter comes with a full-featured and very fast abstracted database
-class that supports both traditional structures and Query Builder
-patterns. The database functions offer clear, simple syntax.
+CodeIgniter 提供了一个功能齐全且非常快速的抽象数据库类，支持传统的数据库操作和查询构建器模式。数据库函数提供了清晰、简洁的语法。
 
 .. toctree::
     :titlesonly:
 
-    Quick Start: Usage Examples <examples>
-    Database Configuration <configuration>
-    Connecting to a Database <connecting>
+    快速入门：使用示例 <examples>
+    数据库配置 <configuration>
+    连接数据库 <connecting>
     Running Queries <queries>
     Generating Query Results <results>
-    Query Helper Functions <helpers>
+    查询辅助方法 <helpers>
     Query Builder Class <query_builder>
     Transactions <transactions>
-    Getting MetaData <metadata>
-    Custom Function Calls <call_function>
-    Using CodeIgniter's Model <model>
-    Using Entity Classes <entities>
-    Database Manipulation with Database Forge <forge>
-    Database Migrations <migration>
-    Database Seeding <seeds>
-    Database Events <events>
+    Getting Metadata <metadata>
+    自定义函数调用 <call_function>
+    数据库事件 <events>
+    Database Utilities <utilities>

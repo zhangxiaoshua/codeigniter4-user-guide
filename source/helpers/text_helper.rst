@@ -1,429 +1,321 @@
-###########
-Text Helper
-###########
+############
+文本辅助函数
+############
 
-The Text Helper file contains functions that assist in working with Text.
+文本辅助函数文件包含了一系列辅助处理文本的函数。
 
 .. contents::
-  :local:
+    :local:
+    :depth: 2
 
-.. raw:: html
-
-  <div class="custom-index container"></div>
-
-Loading this Helper
+加载辅助函数
 ===================
 
-This helper is loaded using the following code::
+使用以下代码加载此辅助函数：
 
-	helper('text');
+.. literalinclude:: text_helper/001.php
 
-Available Functions
+可用函数
 ===================
 
-The following functions are available:
+提供以下函数：
 
 .. php:function:: random_string([$type = 'alnum'[, $len = 8]])
 
-	:param	string	$type: Randomization type
-	:param	int	$len: Output string length
-	:returns:	A random string
-	:rtype:	string
+    :param    string    $type: 随机化类型
+    :param    int    $len: 输出字符串长度
+    :returns:    随机字符串
+    :rtype:    string
 
-	Generates a random string based on the type and length you specify.
-	Useful for creating passwords or generating random hashes.
+    根据指定的类型和长度生成随机字符串。适用于创建密码或生成随机哈希值。
 
-	The first parameter specifies the type of string, the second parameter
-	specifies the length. The following choices are available:
+    第一个参数指定字符串类型，第二个参数指定长度。可选类型如下：
 
-	-  **alpha**: A string with lower and uppercase letters only.
-	-  **alnum**: Alpha-numeric string with lower and uppercase characters.
-	-  **basic**: A random number based on ``mt_rand()``.
-	-  **numeric**: Numeric string.
-	-  **nozero**: Numeric string with no zeros.
-	-  **md5**: An encrypted random number based on ``md5()`` (fixed length of 32).
-	-  **sha1**: An encrypted random number based on ``sha1()`` (fixed length of 40).
-        -  **crypto**: A random string based on ``random_bytes()``.
+    - **alpha**: 仅包含大小写字母的字符串。
+    - **alnum**: 包含大小写字母和数字的字母数字字符串。
+    - **numeric**: 数字字符串。
+    - **nozero**: 不含 0 的数字字符串。
+    - **crypto**: 基于 ``random_bytes()`` 的随机字符串。
 
-	Usage example::
+    .. note:: 使用 **crypto** 时，第二个参数必须设为偶数。自 v4.2.2 起，若设为奇数，将抛出 ``InvalidArgumentException`` 异常。
 
-		echo random_string('alnum', 16);
+    .. note:: 自 v4.3.3 起，**alpha**、**alnum** 和 **nozero** 使用 ``random_byte()``，**numeric** 使用 ``random_int()``。在之前的版本中，这些类型使用的是并非加密安全的 ``str_shuffle()``。
+
+    用法示例：
+
+    .. literalinclude:: text_helper/002.php
 
 .. php:function:: increment_string($str[, $separator = '_'[, $first = 1]])
 
-	:param	string	$str: Input string
-	:param	string	$separator: Separator to append a duplicate number with
-	:param	int	$first: Starting number
-	:returns:	An incremented string
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    string    $separator: 用于追加重复数字的分隔符
+    :param    int    $first: 起始数字
+    :returns:    递增后的字符串
+    :rtype:    string
 
-	Increments a string by appending a number to it or increasing the
-	number. Useful for creating "copies" or a file or duplicating database
-	content which has unique titles or slugs.
+    通过在字符串后追加数字或增加原有数字来递增字符串。适用于创建文件“副本”，或复制具有唯一标题或别名的数据库内容。
 
-	Usage example::
+    用法示例：
 
-		echo increment_string('file', '_'); // "file_1"
-		echo increment_string('file', '-', 2); // "file-2"
-		echo increment_string('file_4'); // "file_5"
-
+    .. literalinclude:: text_helper/003.php
 
 .. php:function:: alternator($args)
 
-	:param	mixed	$args: A variable number of arguments
-	:returns:	Alternated string(s)
-	:rtype:	mixed
+    :param    mixed    $args: 可变数量的参数
+    :returns:    交替后的字符串
+    :rtype:    mixed
 
-	Allows two or more items to be alternated between, when cycling through
-	a loop. Example::
+    用于在循环中交替使用两个或多个项目。示例：
 
-		for ($i = 0; $i < 10; $i++)
-		{     
-			echo alternator('string one', 'string two');
-		}
+    .. literalinclude:: text_helper/004.php
 
-	You can add as many parameters as you want, and with each iteration of
-	your loop the next item will be returned.
+    可根据需要添加任意数量的参数，每次循环迭代时将返回下一个项目。
 
-	::
+    .. literalinclude:: text_helper/005.php
 
-		for ($i = 0; $i < 10; $i++)
-		{     
-			echo alternator('one', 'two', 'three', 'four', 'five');
-		}
-
-	.. note:: To use multiple separate calls to this function simply call the
-		function with no arguments to re-initialize.
-
+    .. note:: 若要多次独立调用此函数，只需在调用时不带任何参数即可重新初始化。
 
 .. php:function:: reduce_double_slashes($str)
 
-	:param	string	$str: Input string
-	:returns:	A string with normalized slashes
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    格式化斜杠后的字符串
+    :rtype:    string
 
-	Converts double slashes in a string to a single slash, except those
-	found in URL protocol prefixes (e.g. http&#58;//).
+    将字符串中的双斜杠转换为单斜杠，但会忽略 URL 协议前缀（如 http&#58;//）中的双斜杠。
 
-	Example::
+    示例：
 
-		$string = "http://example.com//index.php";
-		echo reduce_double_slashes($string); // results in "http://example.com/index.php"
-
+    .. literalinclude:: text_helper/006.php
 
 .. php:function:: strip_slashes($data)
 
-	:param	mixed	$data: Input string or an array of strings
-	:returns:	String(s) with stripped slashes
-	:rtype:	mixed
+    :param    mixed    $data: 输入字符串或字符串数组
+    :returns:    移除斜杠后的字符串或数组
+    :rtype:    mixed
 
-	Removes any slashes from an array of strings.
+    移除字符串数组中的所有斜杠。
 
-	Example::
+    示例：
 
-		$str = array(
-			'question'  => 'Is your name O\'reilly?',
-			'answer' => 'No, my name is O\'connor.'
-		);
+    .. literalinclude:: text_helper/007.php
 
-		$str = strip_slashes($str);
+    以上代码将返回以下数组：
 
-	The above will return the following array::
+    .. literalinclude:: text_helper/008.php
 
-		array(
-			'question'  => "Is your name O'reilly?",
-			'answer' => "No, my name is O'connor."
-		);
+    .. note:: 出于历史原因，此函数也支持并处理字符串输入。此时，它仅作为 ``stripslashes()`` 的别名。
 
-	.. note:: For historical reasons, this function will also accept
-		and handle string inputs. This however makes it just an
-		alias for ``stripslashes()``.
-		
+.. php:function:: reduce_multiples($str[, $character = ','[, $trim = false]])
 
-.. php:function:: reduce_multiples($str[, $character = ''[, $trim = FALSE]])
+    :param    string    $str: 待搜索文本
+    :param    string    $character: 待压缩字符
+    :param    bool    $trim: 是否同时 trim 指定的字符
+    :returns:    压缩后的字符串
+    :rtype:    string
 
-	:param	string	$str: Text to search in
-	:param	string	$character: Character to reduce
-	:param	bool	$trim: Whether to also trim the specified character
-	:returns:	Reduced string
-	:rtype:	string
+    压缩连续出现的多个特定字符。示例：
 
-	Reduces multiple instances of a particular character occuring directly
-	after each other. Example::
+    .. literalinclude:: text_helper/009.php
 
-		$string = "Fred, Bill,, Joe, Jimmy";
-		$string = reduce_multiples($string,","); //results in "Fred, Bill, Joe, Jimmy"
+    若第三个参数设为 ``true``，则会同时移除字符串首尾出现的该字符。示例：
 
-	If the third parameter is set to TRUE it will remove occurrences of the
-	character at the beginning and the end of the string. Example::
-
-		$string = ",Fred, Bill,, Joe, Jimmy,";
-		$string = reduce_multiples($string, ", ", TRUE); //results in "Fred, Bill, Joe, Jimmy"
+    .. literalinclude:: text_helper/010.php
 
 .. php:function:: quotes_to_entities($str)
 
-	:param	string	$str: Input string
-	:returns:	String with quotes converted to HTML entities
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    引号转换为 HTML 实体后的字符串
+    :rtype:    string
 
-	Converts single and double quotes in a string to the corresponding HTML
-	entities. Example::
+    将字符串中的单引号和双引号转换为对应的 HTML 实体。示例：
 
-		$string = "Joe's \"dinner\"";
-		$string = quotes_to_entities($string); //results in "Joe&#39;s &quot;dinner&quot;"
-
+    .. literalinclude:: text_helper/011.php
 
 .. php:function:: strip_quotes($str)
 
-	:param	string	$str: Input string
-	:returns:	String with quotes stripped
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    移除引号后的字符串
+    :rtype:    string
 
-	Removes single and double quotes from a string. Example::
+    移除字符串中的单引号和双引号。示例：
 
-		$string = "Joe's \"dinner\"";
-		$string = strip_quotes($string); //results in "Joes dinner"
-		
-.. php:function:: word_limiter($str[, $limit = 100[, $end_char = '&#8230;']])
+    .. literalinclude:: text_helper/012.php
 
-	:param	string	$str: Input string
-	:param	int	$limit: Limit
-	:param	string	$end_char: End character (usually an ellipsis)
-	:returns:	Word-limited string
-	:rtype:	string
+.. php:function:: word_limiter($str[, $limit = 100[, $endChar = '&#8230;']])
 
-	Truncates a string to the number of *words* specified. Example::
+    :param    string    $str: 输入字符串
+    :param    int    $limit: 限制数量
+    :param    string    $endChar: 结束字符（通常为省略号）
+    :returns:    截断后的字符串
+    :rtype:    string
 
-		$string = "Here is a nice text string consisting of eleven words.";
-		$string = word_limiter($string, 4);
-		// Returns:  Here is a nice
+    将字符串截断为指定的 **单词** 数。示例：
 
-	The third parameter is an optional suffix added to the string. By
-	default it adds an ellipsis.
+    .. literalinclude:: text_helper/013.php
 
+    第三个参数是添加到字符串末尾的可选后缀，默认使用省略号。
 
-.. php:function:: character_limiter($str[, $n = 500[, $end_char = '&#8230;']])
+.. php:function:: character_limiter($string[, $limit = 500[, $endChar = '&#8230;']])
 
-	:param	string	$str: Input string
-	:param	int	$n: Number of characters
-	:param	string	$end_char: End character (usually an ellipsis)
-	:returns:	Character-limited string
-	:rtype:	string
+    :param    string    $string: 输入字符串
+    :param    int    $limit: 字符数
+    :param    string    $endChar: 结束字符（通常为省略号）
+    :returns:    截断后的字符串
+    :rtype:    string
 
-	Truncates a string to the number of *characters* specified. It
-	maintains the integrity of words so the character count may be slightly
-	more or less than what you specify.
+    将字符串截断为指定的 **字符** 数。该函数会保持单词的完整性，因此字符数可能会略多或略少于设定值。
 
-	Example::
+    示例：
 
-		$string = "Here is a nice text string consisting of eleven words.";
-		$string = character_limiter($string, 20);
-		// Returns:  Here is a nice text string
+    .. literalinclude:: text_helper/014.php
 
-	The third parameter is an optional suffix added to the string, if
-	undeclared this helper uses an ellipsis.
+    第三个参数是添加到字符串末尾的可选后缀。若未声明，则使用省略号。
 
-	.. note:: If you need to truncate to an exact number of characters please
-		see the :php:func:`ellipsize()` function below.
+    .. note:: 如需截断为精确数量的字符，请参阅下文的 :php:func:`ellipsize()` 函数。
 
 .. php:function:: ascii_to_entities($str)
 
-	:param	string	$str: Input string
-	:returns:	A string with ASCII values converted to entities
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    ASCII 值转换为实体后的字符串
+    :rtype:    string
 
-	Converts ASCII values to character entities, including high ASCII and MS
-	Word characters that can cause problems when used in a web page, so that
-	they can be shown consistently regardless of browser settings or stored
-	reliably in a database. There is some dependence on your server's
-	supported character sets, so it may not be 100% reliable in all cases,
-	but for the most part it should correctly identify characters outside
-	the normal range (like accented characters).
+    将 ASCII 值转换为字符实体（包括在网页中使用时可能引起问题的扩展 ASCII 和 MS Word 字符）。由此，无论浏览器如何设置都能一致显示，或可靠地存储到数据库中。此函数在一定程度上取决于服务器支持的字符集，因此在某些情况下可能并非 100% 可靠，但在大多数情况下，它能正确识别常规范围之外的字符（如重音字符）。
 
-	Example::
+    示例：
 
-		$string = ascii_to_entities($string);
+    .. literalinclude:: text_helper/015.php
 
-.. php:function::entities_to_ascii($str[, $all = TRUE])
+.. php:function:: entities_to_ascii($str[, $all = true])
 
-	:param	string	$str: Input string
-	:param	bool	$all: Whether to convert unsafe entities as well
-	:returns:	A string with HTML entities converted to ASCII characters
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    bool    $all: 是否也转换不安全实体
+    :returns:    HTML 实体转换为 ASCII 字符后的字符串
+    :rtype:    string
 
-	This function does the opposite of :php:func:`ascii_to_entities()`.
-	It turns character entities back into ASCII.
+    此函数功能与 :php:func:`ascii_to_entities()` 相反，负责将字符实体转回 ASCII。
 
 .. php:function:: convert_accented_characters($str)
 
-	:param	string	$str: Input string
-	:returns:	A string with accented characters converted
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    重音字符转换后的字符串
+    :rtype:    string
 
-	Transliterates high ASCII characters to low ASCII equivalents. Useful
-	when non-English characters need to be used where only standard ASCII
-	characters are safely used, for instance, in URLs.
+    将高位 ASCII 字符音译为对应的低位 ASCII 字符。适用于必须使用标准 ASCII 字符的场景（如 URL）中处理非英语字符。
 
-	Example::
+    示例：
 
-		$string = convert_accented_characters($string);
+    .. literalinclude:: text_helper/016.php
 
-	.. note:: This function uses a companion config file
-		`application/Config/ForeignCharacters.php` to define the to and
-		from array for transliteration.
+    .. note:: 此函数使用配套配置文件 **app/Config/ForeignCharacters.php** 来定义音译所需的转换数组。
 
 .. php:function:: word_censor($str, $censored[, $replacement = ''])
 
-	:param	string	$str: Input string
-	:param	array	$censored: List of bad words to censor
-	:param	string	$replacement: What to replace bad words with
-	:returns:	Censored string
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    array    $censored: 待过滤的敏感词列表
+    :param    string    $replacement: 用于替换敏感词的内容
+    :returns:    过滤后的字符串
+    :rtype:    string
 
-	Enables you to censor words within a text string. The first parameter
-	will contain the original string. The second will contain an array of
-	words which you disallow. The third (optional) parameter can contain
-	a replacement value for the words. If not specified they are replaced
-	with pound signs: ####.
+    用于过滤文本字符串中的词汇。第一个参数为原始字符串，第二个参数为禁用的词汇数组。第三个参数（可选）为替换值。若未指定，敏感词将被替换为井号：####。
 
-	Example::
+    示例：
 
-		$disallowed = array('darn', 'shucks', 'golly', 'phooey');
-		$string = word_censor($string, $disallowed, 'Beep!');
+    .. literalinclude:: text_helper/017.php
 
 .. php:function:: highlight_code($str)
 
-	:param	string	$str: Input string
-	:returns:	String with code highlighted via HTML
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    经 HTML 高亮处理后的代码字符串
+    :rtype:    string
 
-	Colorizes a string of code (PHP, HTML, etc.). Example::
+    为代码字符串（PHP、HTML 等）着色。示例：
 
-		$string = highlight_code($string);
+    .. literalinclude:: text_helper/018.php
 
-	The function uses PHP's ``highlight_string()`` function, so the
-	colors used are the ones specified in your php.ini file.
-
+    此函数使用 PHP 的 ``highlight_string()`` 函数，因此所用颜色为 php.ini 文件中指定的颜色。
 
 .. php:function:: highlight_phrase($str, $phrase[, $tag_open = '<mark>'[, $tag_close = '</mark>']])
 
-	:param	string	$str: Input string
-	:param	string	$phrase: Phrase to highlight
-	:param	string	$tag_open: Opening tag used for the highlight
-	:param	string	$tag_close: Closing tag for the highlight
-	:returns:	String with a phrase highlighted via HTML
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    string    $phrase: 待高亮的短语
+    :param    string    $tag_open: 用于高亮的起始标签
+    :param    string    $tag_close: 用于高亮的结束标签
+    :returns:    经 HTML 高亮处理后的短语字符串
+    :rtype:    string
 
-	Will highlight a phrase within a text string. The first parameter will
-	contain the original string, the second will contain the phrase you wish
-	to highlight. The third and fourth parameters will contain the
-	opening/closing HTML tags you would like the phrase wrapped in.
+    高亮文本字符串中的特定短语。第一个参数为原始字符串，第二个参数为待高亮的短语。第三个和第四个参数为包裹短语的 HTML 起始/结束标签。
 
-	Example::
+    示例：
 
-		$string = "Here is a nice text string about nothing in particular.";
-		echo highlight_phrase($string, "nice text", '<span style="color:#990000;">', '</span>');
+    .. literalinclude:: text_helper/019.php
 
-	The above code prints::
+    以上代码输出::
 
-		Here is a <span style="color:#990000;">nice text</span> string about nothing in particular.
+        Here is a <span style="color:#990000;">nice text</span> string about nothing in particular.
 
-	.. note:: This function used to use the ``<strong>`` tag by default. Older browsers
-		might not support the new HTML5 mark tag, so it is recommended that you
-		insert the following CSS code into your stylesheet if you need to support
-		such browsers::
+    .. note:: 此函数以前默认使用 ``<strong>`` 标签。旧版浏览器可能不支持 HTML5 的 mark 标签。如需支持此类浏览器，建议在样式表中插入以下 CSS 代码
+        ::
 
-			mark {
-				background: #ff0;
-				color: #000;
-			};
-			
+            mark {
+                background: #ff0;
+                color: #000;
+            };
 
 .. php:function:: word_wrap($str[, $charlim = 76])
 
-	:param	string	$str: Input string
-	:param	int	$charlim: Character limit
-	:returns:	Word-wrapped string
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    int    $charlim: 字符限制
+    :returns:    换行处理后的字符串
+    :rtype:    string
 
-	Wraps text at the specified *character* count while maintaining
-	complete words.
+    在保持单词完整的前提下，按指定的 **字符** 数对文本进行换行处理。
 
-	Example::
+    示例：
 
-		$string = "Here is a simple string of text that will help us demonstrate this function.";
-		echo word_wrap($string, 25);
-
-		// Would produce:  
-		// Here is a simple string
-		// of text that will help us
-		// demonstrate this
-		// function.
-		
+    .. literalinclude:: text_helper/020.php
 
 .. php:function:: ellipsize($str, $max_length[, $position = 1[, $ellipsis = '&hellip;']])
 
-	:param	string	$str: Input string
-	:param	int	$max_length: String length limit
-	:param	mixed	$position: Position to split at (int or float)
-	:param	string	$ellipsis: What to use as the ellipsis character
-	:returns:	Ellipsized string
-	:rtype:	string
+    :param    string    $str: 输入字符串
+    :param    int    $max_length: 字符串长度限制
+    :param    mixed    $position: 分割位置（整数或浮点数）
+    :param    string    $ellipsis: 用作省略号的字符
+    :returns:    省略处理后的字符串
+    :rtype:    string
 
-	This function will strip tags from a string, split it at a defined
-	maximum length, and insert an ellipsis.
+    此函数会从字符串中移除标签，按设定的最大长度截断并插入省略号。
 
-	The first parameter is the string to ellipsize, the second is the number
-	of characters in the final string. The third parameter is where in the
-	string the ellipsis should appear from 0 - 1, left to right. For
-	example. a value of 1 will place the ellipsis at the right of the
-	string, .5 in the middle, and 0 at the left.
+    第一个参数是待处理字符串，第二个参数是最终字符串的字符数。第三个参数决定省略号出现的位置（0 - 1，从左至右）。例如：1 表示省略号在字符串右侧，0.5 表示在中间，0 表示在左侧。
 
-	An optional forth parameter is the kind of ellipsis. By default,
-	&hellip; will be inserted.
+    可选的第四个参数是省略号的类型。默认插入 &hellip;。
 
-	Example::
+    示例：
 
-		$str = 'this_string_is_entirely_too_long_and_might_break_my_design.jpg';
-		echo ellipsize($str, 32, .5);
+    .. literalinclude:: text_helper/021.php
 
-	Produces::
+    输出：:
 
-		this_string_is_e&hellip;ak_my_design.jpg
-		
+        this_string_is_e&hellip;ak_my_design.jpg
+
 .. php:function:: excerpt($text, $phrase = false, $radius = 100, $ellipsis = '...')
 
-	:param	string	$text: Text to extract an excerpt
-	:param	string	$phrase: Phrase or word to extract the text arround
-	:param	int		$radius: Number of characters before and after $phrase
-	:param	string	$ellipsis: What to use as the ellipsis character
-	:returns:	Excerpt.
-	:rtype:		string
+    :param    string    $text: 待提取摘要的文本
+    :param    string    $phrase: 用于提取周边文本的核心短语或单词
+    :param    int        $radius: $phrase 前后的字符数
+    :param    string    $ellipsis: 用作省略号的字符
+    :returns:    文本摘要。
+    :rtype:        string
 
-	This function will extract $radius number of characters before and after the
-	central $phrase with an elipsis before and after.
-	
-	The first paramenter is the text to extract an excerpt from, the second is the
-	central word or phrase to count before and after. The third parameter is the
-	number of characters to count before and after the central phrase. If no phrase
-	passed, the excerpt will include the first $radius characters with the elipsis
-	at the end.
+    此函数会提取中心短语 ``$phrase`` 前后各 ``$radius`` 个字符，并在首尾添加省略号。
 
-	Example::
+    第一个参数是待提取摘要的文本，第二个参数是用于计算前后长度的核心词或短语。第三个参数是核心短语前后需保留的字符数。若未传递短语，摘要将包含前 ``$radius`` 个字符并在末尾添加省略号。
 
-		$text = 'Ut vel faucibus odio. Quisque quis congue libero. Etiam gravida 
-		eros lorem, eget porttitor augue dignissim tincidunt. In eget risus eget 
-		mauris faucibus molestie vitae ultricies odio. Vestibulum id ultricies diam. 
-		Curabitur non mauris lectus. Phasellus eu sodales sem. Integer dictum purus 
-		ac enim hendrerit gravida. Donec ac magna vel nunc tincidunt molestie sed 
-		vitae nisl. Cras sed auctor mauris, non dictum tortor. Nulla vel scelerisque 
-		arcu. Cras ac ipsum sit amet augue laoreet laoreet. Aenean a risus lacus. 
-		Sed ut tortor diam.';
-		
-		echo excerpt($str, 'Donec');
+    示例：
 
-	Produces::
+    .. literalinclude:: text_helper/022.php
 
-		... non mauris lectus. Phasellus eu sodales sem. Integer dictum purus ac 
-		enim hendrerit gravida. Donec ac magna vel nunc tincidunt molestie sed 
-		vitae nisl. Cras sed auctor mauris, non dictum ...
+    输出::
+
+        ... non mauris lectus. Phasellus eu sodales sem. Integer dictum purus ac
+        enim hendrerit gravida. Donec ac magna vel nunc tincidunt molestie sed
+        vitae nisl. Cras sed auctor mauris, non dictum tortor. ...

@@ -1,0 +1,30 @@
+版本 4.0.0
+=============
+
+发布日期：2020 年 2 月 24 日
+
+**CodeIgniter4 的 4.0 版本发布**
+
+.. contents::
+    :local:
+    :depth: 2
+
+增强功能
+------------
+
+- 更新了欢迎视图文件
+- 调试工具栏现在支持深色模式
+- 新增了 alpha_numeric_punct 验证规则
+- 将 Kint 从 2.x 分支更新到了最新的 3.x 分支,并新增了配置文件以指定选项
+- 新增了更多入门指南
+- 修复了 CLI 处理复杂参数的问题
+- 改进了 File 类
+- 新增了 :php:func:`model()` 辅助方法,用于轻松实现单例模式的 Model
+- 完全重组了测试代码,以使应用层测试开箱即用更简单。
+
+仓库变更
+------------
+
+devstarter 仓库已被废弃。
+
+我们现在在主仓库的 `CHANGELOG.md <https://github.com/codeigniter4/CodeIgniter4/blob/develop/CHANGELOG.md>`_ 文件中自动生成了变更日志。详情请见该文件。

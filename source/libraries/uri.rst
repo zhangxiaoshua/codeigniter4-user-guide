@@ -1,250 +1,237 @@
 *****************
-Working with URIs
+处理 URI
 *****************
 
-CodeIngiter provides an object oriented solution for working with URI's in your application. Using this makes it
-simple to ensure that the structure is always correct, no matter how complex the URI might be, as well as adding
-relative URI to an existing one and have it resolved safely and correctly.
+CodeIgniter 提供了面向对象的方式处理应用中的 URI。使用该类可轻松确保 URI 结构始终正确，
+无论 URI 多复杂都能应对，同时也支持将相对 URI 安全地解析到已有 URI 中。
 
-.. contents:: Page Contents
-
+.. contents::
+    :local:
+    :depth: 2
 
 ======================
-Creating URI instances
+创建 URI 实例
 ======================
 
-Creating a URI instance is as simple as creating a new class instance::
+创建 URI 实例就像创建一个新的类实例一样简单。
 
-	$uri = new \CodeIgniter\HTTP\URI();
+创建新实例时，可以在构造函数中传入完整或部分 URL，将解析为对应的各部分：
 
-Alternatively, you can use the ``service()`` function to return an instance for you::
+.. literalinclude:: uri/001.php
+    :lines: 2-
 
-	$uri = service('uri');
+或者，也可以使用 :php:func:`service()` 函数返回实例：
 
-When you create the new instance, you can pass a full or partial URL in the constructor and it will be parsed
-into its appropriate sections::
+.. literalinclude:: uri/003.php
+    :lines: 2-
 
-	$uri = new \CodeIgniter\HTTP\URI('http://www.example.com/some/path');
-	$uri = service('uri', 'http://www.example.com/some/path');
+v4.4.0 起，如果不传入 URL，将返回当前 URI：
 
-The Current URI
+.. literalinclude:: uri/002.php
+    :lines: 2-
+
+.. note:: 上述代码返回 ``SiteURI`` 实例，该类继承自 ``URI`` 类。
+    ``URI`` 类用于通用 URI，而 ``SiteURI`` 类用于站点 URI。
+
+当前 URI
 ---------------
 
-Many times, all you really want is an object representing the current URL of this request. This can be accessed
-in two different ways. The first, is to grab it directly from the current request object. Assuming that you're in
-a controller that extends ``CodeIgniter\Controller`` you can get it like::
+当需要一个表示当前请求 URL 的对象时，可使用 :php:func:`current_url()` 函数，该函数位于
+:doc:`../helpers/url_helper` 中：
 
-	$uri = $this->request->uri;
+.. literalinclude:: uri/004.php
+    :lines: 2-
 
-Second, you can use one of the functions available in the **url_helper**::
+必须传入 ``true`` 作为第一个参数，否则将返回当前 URL 的字符串表示。
 
-	helper('url');
-	$uri = current_url(true);
+该 URI 基于当前请求对象和 ``Config\App`` 中的配置（``baseURL``、``indexPage`` 和
+``forceGlobalSecureRequests``）确定的路径（相对于 ``baseURL``）。
 
-You must pass ``true`` as the first parameter, otherwise it will return the string representation of the current URL.
+假设在继承 ``CodeIgniter\Controller`` 的控制器中，也可以这样获取当前 SiteURI 实例：
+
+.. literalinclude:: uri/005.php
+    :lines: 2-
 
 ===========
-URI Strings
+URI 字符串
 ===========
 
-Many times, all you really want is to get a string representation of a URI. This is easy to do by simply casting
-the URI as a string::
+很多时候，只需获取 URI 的字符串表示。将 URI 转为字符串即可：
 
-	$uri = current_url(true);
-	echo (string)$uri;  // http://example.com
+.. literalinclude:: uri/006.php
 
-If you know the pieces of the URI and just want to ensure it's all formatted correctly, you can generate a string
-using the URI class' static ``createURIString()`` method::
+如果已知 URI 的各部分，只想确保格式正确，可以使用 URI 类的静态方法 ``createURIString()`` 生成字符串：
 
-	$uriString = URI::createURIString($scheme, $authority, $path, $query, $fragment);
+.. literalinclude:: uri/007.php
 
-	// Creates: http://exmample.com/some/path?foo=bar#first-heading
-	echo URI::createURIString('http', 'example.com', 'some/path', 'foo=bar', 'first-heading');
+.. important:: 将 ``URI`` 转为字符串时，会根据 ``Config\App`` 中定义的配置自动调整项目 URL。
+    如果需要精确且未经调整的版本，请改用 ``URI::createURIString()``。
 
 =============
-The URI Parts
+URI 各部分
 =============
 
-Once you have a URI instance, you can set or retrieve any of the various parts of the URI. This section will provide
-details on what those parts are, and how to work with them.
+获取 URI 实例后，可以设置或获取 URI 的各个部分。本节将介绍这些部分的含义及操作方法。
 
 Scheme
 ------
 
-The scheme is frequently 'http' or 'https', but any scheme is supported, including 'file', 'mailto', etc.
-::
+Scheme 通常是 'http' 或 'https'，但也支持其他 Scheme，如 'file'、'mailto' 等。
 
-    $uri = new \CodeIgniter\HTTP\URI('http://www.example.com/some/path');
-
-    echo $uri->getScheme(); // 'http'
-    $uri->setScheme('https');
+.. literalinclude:: uri/008.php
 
 Authority
 ---------
 
-Many URIs contain several elements that are collectively known as the 'authority'. This includes any user info,
-the host and the port number. You can retrieve all of these pieces as one single string with the ``getAuthority()``
-method, or you can manipulate the individual parts.
-::
+许多 URI 包含多个统称为 'Authority' 的元素，包括用户信息、主机名和端口号。
+可以使用 ``getAuthority()`` 方法将其作为单个字符串获取，也可以操作各独立部分。
 
-	$uri = new \CodeIgniter\HTTP\URI('ftp://user:password@example.com:21/some/path');
+.. literalinclude:: uri/009.php
 
-	echo $uri->getAuthority();  // user@example.com:21
+默认情况下不会显示密码部分。如需显示密码，可使用 ``showPassword()`` 方法。
+该 URI 实例将持续显示密码，直到关闭该功能，因此使用完毕后务必立即关闭：
 
-By default, this will not display the password portion since you wouldn't want to show that to anyone. If you want
-to show the password, you can use the ``showPassword()`` method. This URI instance will continue to show that password
-until you turn it off again, so always make sure that you turn it off as soon as you are finished with it::
+.. literalinclude:: uri/010.php
 
-	echo $uri->getAuthority();  // user@example.com:21
-	echo $uri->showPassword()->getAuthority();   // user:password@example.com:21
+如果不想显示端口，传入 ``true`` 作为唯一参数：
 
-	// Turn password display off again.
-	$uri->showPassword(false);
+.. literalinclude:: uri/011.php
 
-If you do not want to display the port, pass in ``true`` as the only parameter::
+.. note:: 如果当前端口是该 Scheme 的默认端口，则永远不会显示。
 
-	echo $uri->getAuthority(true);  // user@example.com
-
-.. note:: If the current port is the default port for the scheme it will never be displayed.
-
-Userinfo
+UserInfo
 --------
 
-The userinfo section is simply the username and password that you might see with an FTP URI. While you can get
-this as part of the Authority, you can also retrieve it yourself::
+UserInfo 部分就是 FTP URI 中可能看到的用户名和密码。虽然可以作为 Authority 的一部分获取，
+也可以单独获取：
 
-	echo $uri->getUserInfo();   // user
+.. literalinclude:: uri/012.php
 
-By default, it will not display the password, but you can override that with the ``showPassword()`` method::
+默认不显示密码，但可通过 ``showPassword()`` 方法覆盖此行为：
 
-	echo $uri->showPassword()->getUserInfo();   // user:password
-	$uri->showPassword(false);
+.. literalinclude:: uri/013.php
 
 Host
 ----
 
-The host portion of the URI is typically the domain name of the URL. This can be easily set and retrieved with the
-``getHost()`` and ``setHost()`` methods::
+URI 的 Host 部分通常是域名。使用 ``getHost()`` 和 ``setHost()`` 方法可以轻松设置和获取：
 
-	$uri = new \CodeIgniter\HTTP\URI('http://www.example.com/some/path');
-
-	echo $uri->getHost();   // www.example.com
-	echo $uri->setHost('anotherexample.com')->getHost();    // anotherexample.com
+.. literalinclude:: uri/014.php
 
 Port
 ----
 
-The port is an integer number between 0 and 65535. Each sheme has a default value associated with it.
-::
+Port 是 0 到 65535 之间的整数。每个 Scheme 都有对应的默认值。
 
-	$uri = new \CodeIgniter\HTTP\URI('ftp://user:password@example.com:21/some/path');
+.. literalinclude:: uri/015.php
 
-	echo $uri->getPort();   // 21
-	echo $uri->setPort(2201)->getPort(); // 2201
-
-When using the ``setPort()`` method, the port will be checked that it is within the valid range and assigned.
+使用 ``setPort()`` 方法时，会检查端口是否在有效范围内，然后赋值。
 
 Path
 ----
 
-The path are all of the segments within the site itself. As expected, the ``getPath()`` and ``setPath()`` methods
-can be used to manipulate it::
+Path 是站点内部的所有段。正如预期的那样，可以使用 ``getPath()`` 和 ``setPath()`` 方法进行操作：
 
-	$uri = new \CodeIgniter\HTTP\URI('http://www.example.com/some/path');
+.. literalinclude:: uri/016.php
 
-	echo $uri->getPath();   // 'some/path'
-	echo $uri->setPath('another/path')->getPath();  // 'another/path'
+.. note:: 设置 Path 时，会进行清理以编码危险字符，并移除点号段（dot segment）以确保安全。
 
-.. note:: When setting the path this way, or any other way the class allows, it is sanitized to encode any dangerous
-	characters, and remove dot segments for safety.
+.. note:: v4.4.0 起，``SiteURI::getRoutePath()`` 方法返回相对于 baseURL 的 URI 路径，
+    而 ``SiteURI::getPath()`` 方法始终返回带前导 ``/`` 的完整 URI 路径。
 
 Query
 -----
 
-The query variables can be manipulated through the class using simple string representations. Query values can only
-be set as a string currently.
-::
+可以通过类提供的简单字符串表示法来操作 Query 数据。
 
-	$uri = new \CodeIgniter\HTTP\URI('http://www.example.com?foo=bar');
+获取/设置 Query
+^^^^^^^^^^^^^^^^^^^^^
 
-	echo $uri->getQuery();  // 'foo=bar'
-	$uri->setQuery('foo=bar&bar=baz');
+当前 Query 值只能以字符串形式设置。
 
-.. note:: Query values cannot contain fragments. An InvalidArgumentException will be thrown if it does.
+.. literalinclude:: uri/017.php
 
-You can set query values using an array::
+``setQuery()`` 方法会覆盖现有的查询变量。
 
-    $uri->setQueryArray(['foo' => 'bar', 'bar' => 'baz']);
+.. note:: Query 值不能包含 Fragment。如果包含，将抛出 InvalidArgumentException。
 
-The ``setQuery()`` and ``setQueryArray()`` methods overwrite any existing query variables. You can add a value to the
-query variables collection without destroying the existing query variables with the ``addQuery()`` method. The first
-parameter is the name of the variable, and the second parameter is the value::
+从数组设置 Query
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-    $uri->addQuery('foo', 'bar');
+可以使用数组设置 Query 值：
 
-**Filtering Query Values**
+.. literalinclude:: uri/018.php
 
-You can filter the query values returned by passing an options array to the ``getQuery()`` method, with either an
-*only* or an *except* key::
+``setQueryArray()`` 方法会覆盖现有的 Query 变量。
 
-    $uri = new \CodeIgniter\HTTP\URI('http://www.example.com?foo=bar&bar=baz&baz=foz');
+添加 Query 值
+^^^^^^^^^^^^^^^^^^
 
-    // Returns 'foo=bar'
-    echo $uri->getQuery(['only' => ['foo']);
+使用 ``addQuery()`` 方法可以向 Query 变量集合添加值，而不会破坏现有 Query 变量。
+第一个参数是变量名，第二个参数是值：
 
-    // Returns 'foo=bar&baz=foz'
-    echo $uri->getQuery(['except' => ['bar']]);
+.. literalinclude:: uri/019.php
 
-This only changes the values returned during this one call. If you need to modify the URI's query values more permenantly,
-you can use the ``stripQuery()`` and ``keepQuery()`` methods to change the actual object's query variable collection::
+过滤 Query 值
+^^^^^^^^^^^^^^^^^^^^^^
 
-    $uri = new \CodeIgniter\HTTP\URI('http://www.example.com?foo=bar&bar=baz&baz=foz');
+可以向 ``getQuery()`` 方法传入包含 *only* 或 *except* 键的选项数组来过滤返回的 Query 值：
 
-    // Leaves just the 'baz' variable
-    $uri->stripQuery('foo', 'bar');
+.. literalinclude:: uri/020.php
 
-    // Leaves just the 'foo' variable
-    $uri->keepQuery('foo');
+这仅改变本次调用返回的值。
+
+修改 Query 值
+^^^^^^^^^^^^^^^^^^^^^
+
+如需更永久地修改 URI 的 Query 值，可以使用 ``stripQuery()`` 和 ``keepQuery()`` 方法
+来更改对象实际的 Query 变量集合：
+
+.. literalinclude:: uri/021.php
+
+.. note:: 默认情况下，``setQuery()`` 和 ``setQueryArray()`` 方法使用原生 ``parse_str()`` 函数准备数据。
+    如需使用更宽松的规则（允许键名包含点），可提前调用专用方法 ``useRawQueryString()``。
 
 Fragment
 --------
 
-Fragments are the portion at the end of the URL, preceded by the pound-sign (#). In HTML URL's these are links
-to an on-page anchor. Media URI's can make use of them in various other ways.
-::
+Fragment 是 URL 末尾由井号（``#``）开头的部分。在 HTML URL 中，用于链接到页面内的锚点。
+而在媒体 URI 中，则可能有多种其他用途。
 
-	$uri = new \CodeIgniter\HTTP\URI('http://www.example.com/some/path#first-heading');
-
-	echo $uri->getFragment();   // 'first-heading'
-	echo $uri->setFragment('second-heading')->getFragment();    // 'second-heading'
+.. literalinclude:: uri/022.php
 
 ============
-URI Segments
+URI 段
 ============
 
-Each section of the path between the slashes are a single segment. The URI class provides a simple way to determine
-what the values of the segments are. The segments start at 1 being the furthest left of the path.
-::
+路径中每两个斜杠之间的部分就是一个段。
 
-	// URI = http://example.com/users/15/profile
+.. note:: 对于站点 URI，URI 段仅指相对于 baseURL 的 URI 路径部分。
+    如果 ``baseURL`` 包含子文件夹，其值将与当前 URI 路径不同。
 
-	// Prints '15'
-	if ($request->uri->getSegment(1) == 'users')
-	{
-		echo $request->uri->getSegment(2);
-	}
+URI 类提供了一种简单的方法来确定各段的值。段从 1 开始计数，最左侧的段为 1。
 
-You can get a count of the total segments::
+.. literalinclude:: uri/023.php
 
-	$total = $request->uri->getTotalSegments(); // 3
+也可以使用 ``getSegment()`` 方法的第二个参数为特定段设置不同的默认值。默认值为空字符串。
 
-Finally, you can retrieve an array of all of the segments::
+.. literalinclude:: uri/024.php
 
-	$segments = $request->uri->getSegments();
+.. note:: 可以获取最后一个段的下一个段。尝试获取最后一个段的下两个或更后面的段时，
+    默认会抛出异常。可通过 ``setSilent()`` 方法阻止抛出异常。
 
-	// $segments =
-	[
-		0 => 'users',
-		1 => '15',
-		2 => 'profile'
-	]
+可以获取段的总数：
+
+.. literalinclude:: uri/025.php
+
+最后，还可以获取包含所有段的数组：
+
+.. literalinclude:: uri/026.php
+
+===========================
+禁用抛出异常
+===========================
+
+默认情况下，该类的某些方法可能会抛出异常。如需禁用，可设置特殊标志阻止抛出异常。
+
+.. literalinclude:: uri/027.php

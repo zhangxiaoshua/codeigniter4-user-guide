@@ -1,58 +1,57 @@
 ###############
-Security Helper
+安全辅助函数
 ###############
 
-The Security Helper file contains security related functions.
+安全辅助函数文件包含与安全相关的函数。
 
 .. contents::
-:local:
+    :local:
+    :depth: 2
 
-Loading this Helper
+加载此辅助函数
 ===================
 
-This helper is loaded using the following code::
+使用以下代码加载此辅助函数：
 
-	helper('security');
+.. literalinclude:: security_helper/001.php
 
-Available Functions
+可用函数
 ===================
 
-The following functions are available:
+提供以下函数：
 
-.. php:function:: sanitize_filename($filename)
+.. php:function:: sanitize_filename($filename[, $relativePath = false])
 
-	:param	string	$filename: Filename
-    	:returns:	Sanitized file name
-    	:rtype:	string
+    :param    string    $filename: 文件名
+    :param    bool      $relativePath: 是否接受相对路径（自 v4.6.2 起可用）
+    :returns:    经过清理的文件名
+    :rtype:    string
 
-    	Provides protection against directory traversal.
+    提供针对目录遍历攻击的保护。
 
-    	This function is an alias for ``\CodeIgniter\Security::sanitize_filename()``.
-	For more info, please see the :doc:`Security Library <../libraries/security>`
-	documentation.
+    更多信息请参考 :doc:`安全类库 <../libraries/security>` 文档。
 
 .. php:function:: strip_image_tags($str)
 
-	:param	string	$str: Input string
-    	:returns:	The input string with no image tags
-    	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    移除图片标签后的输入字符串
+    :rtype:    string
 
-    	This is a security function that will strip image tags from a string.
-    	It leaves the image URL as plain text.
+    这是一个安全函数，用于从字符串中移除图片标签。
+    它会将图片 URL 保留为纯文本。
 
-    	Example::
+    示例：
 
-		$string = strip_image_tags($string);
-
+    .. literalinclude:: security_helper/002.php
 
 .. php:function:: encode_php_tags($str)
 
-	:param	string	$str: Input string
-    	:returns:	Safely formatted string
-    	:rtype:	string
+    :param    string    $str: 输入字符串
+    :returns:    安全格式化的字符串
+    :rtype:    string
 
-    	This is a security function that converts PHP tags to entities.
+    这是一个安全函数，用于将 PHP 标签转换为实体字符。
 
-	Example::
+    示例：
 
-		$string = encode_php_tags($string);
+    .. literalinclude:: security_helper/003.php
